@@ -1,0 +1,12 @@
+npm notice run postpilot@0.1.0 dev
+npm notice run next dev
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.113:3000
+- Environments: .env.local
+✓ Ready in 343ms
+✓ Running next.config.ts took 29ms
+
+ GET /login? 200 in 447ms (next.js: 80ms, proxy.ts: 157ms, application-code: 209ms)
+ GET /login 200 in 60ms (next.js: 6ms, proxy.ts: 7ms, application-code: 47ms)
+ GET /login 200 in 64ms (next.js: 8ms, proxy.ts: 9ms, application-code: 48ms)
