@@ -120,7 +120,7 @@ export function Sidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCloseMobile} aria-hidden />
-          <aside className="glass-panel absolute left-0 top-0 h-full w-[248px] rounded-none border-y-0 border-l-0">
+          <aside className="glass-panel absolute left-0 top-0 h-full w-[224px] rounded-none border-y-0 border-l-0">
             <button
               type="button"
               onClick={onCloseMobile}
