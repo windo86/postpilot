@@ -14,6 +14,21 @@ const appHostname = (() => {
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: appHostname,
+  async headers() {
+    // Header keamanan dasar. CSP penuh ditunda (risiko blokir inline
+    // script Next) — dievaluasi saat production readiness (T-21).
+    const security = [
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+      {
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains; preload",
+      },
+    ];
+    return [{ source: "/:path*", headers: security }];
+  },
 };
 
 export default nextConfig;
