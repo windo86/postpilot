@@ -1,23 +1,22 @@
 import { ApiKeyManager } from "@/components/automation/api-keys";
 import { WebhookManager } from "@/components/automation/webhooks";
+import { PageHeader } from "@/components/content/primitives";
 
 export default function AutomationPage() {
   return (
-    <main className="mx-auto max-w-3xl space-y-8 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Automation</h1>
-        <p className="text-sm text-muted-foreground">
-          API keys untuk n8n & tool eksternal, plus incoming webhook.
-        </p>
-      </header>
-      <section className="space-y-4">
-        <h2 className="text-lg font-medium">API Keys</h2>
+    <div className="mx-auto max-w-3xl space-y-7">
+      <PageHeader
+        title="Automation"
+        description="API keys untuk n8n & tool eksternal, plus incoming webhook."
+      />
+      <section aria-label="API keys" className="space-y-3">
+        <h2 className="text-sm font-medium text-muted-foreground">API Keys</h2>
         <ApiKeyManager />
       </section>
-      <section className="space-y-4">
-        <h2 className="text-lg font-medium">Incoming Webhooks</h2>
+      <section aria-label="Incoming webhooks" className="space-y-3">
+        <h2 className="text-sm font-medium text-muted-foreground">Incoming Webhooks</h2>
         <WebhookManager />
       </section>
-    </main>
+    </div>
   );
 }

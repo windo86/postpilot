@@ -72,15 +72,15 @@ export function WebhookManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
-        <h2 className="font-medium">Buat endpoint webhook</h2>
+    <div className="space-y-3">
+      <div className="space-y-2.5 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
+        <h3 className="text-sm font-medium">Buat endpoint webhook</h3>
         <div className="flex gap-2">
           <Input
             placeholder="Nama, mis. n8n-posting"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="max-w-xs"
+            className="max-w-xs border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)]"
           />
           <Button size="sm" onClick={onCreate}>
             Buat
@@ -92,7 +92,7 @@ export function WebhookManager() {
           </p>
         )}
         {fresh && (
-          <div className="space-y-1 rounded-lg bg-muted p-3 font-mono text-xs break-all">
+          <div className="space-y-1 rounded-xl bg-[rgb(59_130_246/0.10)] p-3 font-mono text-xs break-all">
             <p>URL: {fresh.endpointUrl}</p>
             <p>Secret: {fresh.signingSecret}</p>
             <p className="font-sans text-muted-foreground">
@@ -103,18 +103,18 @@ export function WebhookManager() {
         )}
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {hooks.map((h) => (
           <li
             key={h.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-2 py-2.5 hover:bg-[rgb(255_255_255/0.03)]"
           >
             <div className="text-sm">
               <span className="font-medium">{h.name}</span>{" "}
-              <span className={h.active ? "" : "text-muted-foreground"}>
+              <span className={h.active ? "text-[var(--success)]" : "text-muted-foreground"}>
                 {h.active ? "aktif" : "nonaktif"}
               </span>
-              <span className="ml-2 text-muted-foreground">
+              <span className="ml-2 text-xs text-muted-foreground">
                 {h.last_received_at
                   ? `terakhir ${new Date(h.last_received_at).toLocaleString("id-ID")}`
                   : "belum pernah dipakai"}
@@ -135,9 +135,9 @@ export function WebhookManager() {
         <p className="text-sm text-muted-foreground">Belum ada endpoint.</p>
       )}
 
-      <details className="rounded-xl border border-border bg-card p-4 text-sm">
-        <summary className="cursor-pointer font-medium">Contoh payload</summary>
-        <pre className="mt-2 overflow-x-auto rounded bg-muted p-3 text-xs">
+      <details className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4 text-sm" style={{ background: "var(--surface)" }}>
+        <summary className="cursor-pointer text-sm font-medium">Contoh payload</summary>
+        <pre className="mt-2 overflow-x-auto rounded-xl bg-[rgb(0_0_0/0.35)] p-3 font-mono text-xs leading-relaxed">
 {`POST {endpoint}  (event post.create)
 H: x-webhook-signature: sha256=<hmac-sha256-hex(body)>
 {

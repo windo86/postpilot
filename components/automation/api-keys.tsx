@@ -64,15 +64,15 @@ export function ApiKeyManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
-        <h2 className="font-medium">Buat API key (untuk n8n / tool lain)</h2>
+    <div className="space-y-3">
+      <div className="space-y-2.5 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
+        <h3 className="text-sm font-medium">Buat API key (untuk n8n / tool lain)</h3>
         <div className="flex gap-2">
           <Input
             placeholder="Nama, mis. n8n-prod"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="max-w-xs"
+            className="max-w-xs border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)]"
           />
           <Button size="sm" onClick={onCreate}>
             Buat
@@ -84,7 +84,7 @@ export function ApiKeyManager() {
           </p>
         )}
         {freshKey && (
-          <p role="status" className="rounded-lg bg-muted p-3 font-mono text-sm break-all">
+          <p role="status" className="rounded-xl bg-[rgb(59_130_246/0.10)] p-3 font-mono text-sm break-all">
             {freshKey}
             <span className="mt-1 block font-sans text-muted-foreground">
               Salin sekarang — tidak akan ditampilkan lagi.
@@ -93,16 +93,16 @@ export function ApiKeyManager() {
         )}
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {keys.map((k) => (
           <li
             key={k.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-2 py-2.5 hover:bg-[rgb(255_255_255/0.03)]"
           >
             <div className="text-sm">
               <span className="font-medium">{k.name}</span>{" "}
-              <span className="font-mono text-muted-foreground">{k.key_prefix}…</span>
-              <span className="ml-2 text-muted-foreground">
+              <span className="font-mono text-xs text-muted-foreground">{k.key_prefix}…</span>
+              <span className="ml-2 text-xs text-muted-foreground">
                 {k.revoked_at ? "revoked" : k.last_used_at ? `dipakai ${new Date(k.last_used_at).toLocaleDateString("id-ID")}` : "belum dipakai"}
               </span>
             </div>
@@ -118,9 +118,9 @@ export function ApiKeyManager() {
         <p className="text-sm text-muted-foreground">Belum ada API key.</p>
       )}
 
-      <details className="rounded-xl border border-border bg-card p-4 text-sm">
-        <summary className="cursor-pointer font-medium">Contoh request (n8n / curl)</summary>
-        <pre className="mt-2 overflow-x-auto rounded bg-muted p-3 text-xs">
+      <details className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4 text-sm" style={{ background: "var(--surface)" }}>
+        <summary className="cursor-pointer text-sm font-medium">Contoh request (n8n / curl)</summary>
+        <pre className="mt-2 overflow-x-auto rounded-xl bg-[rgb(0_0_0/0.35)] p-3 font-mono text-xs leading-relaxed">
 {`# Buat post (Idempotency-Key opsional, aman retry)
 curl -X POST https://APP/api/v1/posts \\
   -H "Authorization: Bearer pp_live_..." \\
