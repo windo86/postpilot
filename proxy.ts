@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const PUBLIC_PATHS = ["/login", "/register", "/reset-password", "/update-password", "/terms", "/privacy"];
+const PUBLIC_PREFIXES = ["/terms/", "/privacy/"]; // file verifikasi platform
 
 /**
  * Auth guard: semua route butuh sesi, kecuali halaman auth publik
@@ -12,7 +13,9 @@ export async function proxy(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request);
 
   const isPublic =
-    PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/auth/");
+    PUBLIC_PATHS.includes(pathname) ||
+    PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    pathname.startsWith("/auth/");
 
   // Automation API bawa auth sendiri (API key) — lewatkan tanpa sesi.
   const isKeyAuthenticated =
