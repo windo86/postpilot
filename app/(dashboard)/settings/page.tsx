@@ -1,4 +1,5 @@
 import { AIKeyManager } from "@/components/settings/ai-keys";
+import { NotificationPreferences } from "@/components/settings/notifications";
 
 export default function SettingsPage() {
   return (
@@ -6,10 +7,11 @@ export default function SettingsPage() {
       <header>
         <h1 className="text-2xl font-semibold">Settings</h1>
         <p className="text-sm text-muted-foreground">
-          API key AI milikmu (BYOK) untuk generator konten.
+          API key AI milikmu (BYOK) dan preferensi notifikasi.
         </p>
       </header>
       <AIKeyManager />
+      <NotificationPreferences />
     </main>
   );
 }

@@ -29,3 +29,28 @@ export async function createNotification(
     console.error(`[notify] gagal simpan notifikasi: ${error.message}`);
   }
 }
+
+export interface NotifyPrefs {
+  inApp: boolean;
+  email: boolean;
+}
+
+/** Preferensi user (default nyala bila profile belum ada). */
+export async function getNotifyPrefs(
+  client: SupabaseClient,
+  userId: string
+): Promise<NotifyPrefs> {
+  const { data } = await client
+    .from("profiles")
+    .select("email_notifications_enabled,in_app_notifications_enabled")
+    .eq("id", userId)
+    .single();
+  const row = (data ?? {}) as {
+    email_notifications_enabled?: boolean | null;
+    in_app_notifications_enabled?: boolean | null;
+  };
+  return {
+    inApp: row.in_app_notifications_enabled ?? true,
+    email: row.email_notifications_enabled ?? true,
+  };
+}

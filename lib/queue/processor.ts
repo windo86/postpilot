@@ -22,7 +22,7 @@ import {
   shouldRetry,
   type FailureKind,
 } from "./retry";
-import { createNotification } from "@/lib/notifications";
+import { createNotification, getNotifyPrefs } from "@/lib/notifications";
 import { sendFailureEmail } from "@/lib/notifications/email";
 
 /**
@@ -107,7 +107,11 @@ async function notifyFailure(
   title: string,
   message: string
 ): Promise<void> {
-  await createNotification(client, { userId, title, message, type: "publish_failed" });
+  const prefs = await getNotifyPrefs(client, userId);
+  if (prefs.inApp) {
+    await createNotification(client, { userId, title, message, type: "publish_failed" });
+  }
+  if (!prefs.email) return;
   try {
     const { data } = await client.auth.admin.getUserById(userId);
     const email = data.user?.email;
@@ -142,12 +146,14 @@ async function finalizeSuccess(
     })
     .eq("id", platform.id);
   await recomputePostStatus(client, platform.post_id, userId);
-  await createNotification(client, {
-    userId,
-    title: "Publish berhasil",
-    message: `Post ke ${platform.platform} terkirim.`,
-    type: "publish_succeeded",
-  });
+  if ((await getNotifyPrefs(client, userId)).inApp) {
+    await createNotification(client, {
+      userId,
+      title: "Publish berhasil",
+      message: `Post ke ${platform.platform} terkirim.`,
+      type: "publish_succeeded",
+    });
+  }
 }
 
 async function finalizeFailure(

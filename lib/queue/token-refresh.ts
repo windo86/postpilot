@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { decrypt, encrypt } from "@/lib/crypto";
 import { refreshInstagramToken } from "@/lib/platforms/instagram/client";
-import { createNotification } from "@/lib/notifications";
+import { createNotification, getNotifyPrefs } from "@/lib/notifications";
 
 /**
  * Refresh token platform yang mendekati expiry. Dipanggil worker tiap iterasi.
@@ -58,12 +58,15 @@ export async function refreshDueTokens(client: SupabaseClient): Promise<{ refres
         .eq("id", row.id);
       reauth++;
       if (acc) {
-        await createNotification(client, {
-          userId: (acc as { user_id: string }).user_id,
-          title: "Akun Instagram perlu reconnect",
-          message: `Token expired dan refresh gagal: ${msg.slice(0, 200)}`,
-          type: "token_reauth_required",
-        });
+        const uid = (acc as { user_id: string }).user_id;
+        if ((await getNotifyPrefs(client, uid)).inApp) {
+          await createNotification(client, {
+            userId: uid,
+            title: "Akun Instagram perlu reconnect",
+            message: `Token expired dan refresh gagal: ${msg.slice(0, 200)}`,
+            type: "token_reauth_required",
+          });
+        }
       }
     }
   }
