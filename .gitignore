@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# logs
+*.log
+
 # supabase CLI cache (may contain connection strings)
 supabase/.temp/
 
