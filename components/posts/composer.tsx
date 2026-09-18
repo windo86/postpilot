@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Film, Image as ImageIcon, Smartphone, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PlatformBadge } from "@/components/content/badges";
 import { uploadFile } from "@/components/media/upload-file";
 
 interface MediaItem {
@@ -197,10 +198,10 @@ export function Composer() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="space-y-6">
+    <div className="grid gap-8 lg:grid-cols-2">
+      <div className="space-y-7">
         <section className="space-y-3">
-          <h2 className="font-medium">1. Media</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">1 · Media</h2>
           <Input
             type="file"
             ref={fileRef}
@@ -218,8 +219,11 @@ export function Composer() {
                   key={m.id}
                   type="button"
                   onClick={() => toggleMedia(m.id)}
-                  className={`flex items-center gap-1.5 truncate rounded-lg border p-2 text-left text-xs ${
-                    active ? "border-primary bg-muted" : "border-border"
+                  aria-pressed={active}
+                  className={`flex items-center gap-1.5 truncate rounded-xl border p-2 text-left text-xs transition-colors ${
+                    active
+                      ? "border-accent/50 bg-[rgb(59_130_246/0.10)]"
+                      : "border-[rgb(255_255_255/0.07)] hover:bg-[rgb(255_255_255/0.04)]"
                   }`}
                   title={m.original_name ?? ""}
                 >
@@ -236,28 +240,39 @@ export function Composer() {
           )}
         </section>
 
-        <section className="space-y-3">
-          <h2 className="font-medium">2. Akun target</h2>
+        <section className="space-y-2">
+          <h2 className="text-sm font-medium text-muted-foreground">2 · Akun target</h2>
           {accounts.length === 0 && (
             <p className="text-sm text-muted-foreground">
               Belum ada akun aktif. <Link href="/accounts" className="underline">Connect dulu</Link>.
             </p>
           )}
-          {accounts.map((a) => (
-            <label key={a.id} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={selectedAccounts.includes(a.id)}
-                onChange={() => toggleAccount(a.id)}
-              />
-              <span className="rounded bg-muted px-2 py-0.5 text-xs uppercase">{a.platform}</span>
-              {a.username ?? a.platform_account_id}
-            </label>
-          ))}
+          {accounts.map((a) => {
+            const checked = selectedAccounts.includes(a.id);
+            return (
+              <label
+                key={a.id}
+                className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-sm transition-colors ${
+                  checked
+                    ? "border-accent/50 bg-[rgb(59_130_246/0.08)]"
+                    : "border-[rgb(255_255_255/0.07)] hover:bg-[rgb(255_255_255/0.03)]"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleAccount(a.id)}
+                  className="size-4 accent-[#2f6de4]"
+                />
+                <PlatformBadge platform={a.platform} />
+                <span className="truncate">{a.username ?? a.platform_account_id}</span>
+              </label>
+            );
+          })}
         </section>
 
-        <section className="space-y-4">
-          <h2 className="font-medium">3. Caption per platform</h2>
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-muted-foreground">3 · Caption per platform</h2>
           <Input
             placeholder="Judul internal (opsional)"
             value={title}
@@ -269,9 +284,10 @@ export function Composer() {
             const d = drafts[accId];
             if (!d) return null;
             return (
-              <div key={accId} className="space-y-2 rounded-xl border border-border p-4">
-                <p className="text-sm font-medium">
-                  {acc.platform} — {acc.username ?? acc.platform_account_id}
+              <div key={accId} className="space-y-2.5 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
+                <p className="flex items-center gap-2 text-sm font-medium">
+                  <PlatformBadge platform={acc.platform} />
+                  {acc.username ?? acc.platform_account_id}
                 </p>
                 <textarea
                   rows={3}
@@ -279,7 +295,7 @@ export function Composer() {
                   placeholder={`Caption ${acc.platform}...`}
                   value={d.caption}
                   onChange={(e) => patchDraft(accId, { caption: e.target.value })}
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-accent/60"
                 />
                 <p className="text-xs text-muted-foreground">{d.caption.length}/2200</p>
                 <Input
@@ -332,7 +348,7 @@ export function Composer() {
       </div>
 
       <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-        <h2 className="font-medium">Preview</h2>
+        <h2 className="text-sm font-medium text-muted-foreground">Preview</h2>
         {selectedAccounts.length === 0 && (
           <div className="mx-auto w-full max-w-[300px] rounded-[2rem] border border-border bg-card p-3">
             <div className="mx-auto mb-3 h-1.5 w-24 rounded-full bg-muted" />
@@ -349,8 +365,8 @@ export function Composer() {
           const d = drafts[accId];
           if (!acc || !d) return null;
           return (
-            <article key={accId} className="rounded-xl border border-border bg-card p-4">
-              <p className="text-xs uppercase text-muted-foreground">{acc.platform}</p>
+            <article key={accId} className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
+              <PlatformBadge platform={acc.platform} />
               <div className="mt-2 flex gap-2 overflow-x-auto">
                 {selectedMedia.map((mid) => (
                   <div key={mid} className="h-24 w-24 shrink-0 rounded bg-muted">

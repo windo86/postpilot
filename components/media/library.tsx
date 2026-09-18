@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { uploadFile } from "@/components/media/upload-file";
@@ -40,26 +41,32 @@ function AssetCard({ asset, onDeleted }: { asset: Asset; onDeleted: () => void }
   }
 
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex aspect-square items-center justify-center bg-muted">
+    <article className="group overflow-hidden rounded-2xl border border-[rgb(255_255_255/0.07)]" style={{ background: "var(--surface)" }}>
+      <div className="flex aspect-square items-center justify-center bg-[rgb(255_255_255/0.03)]">
         {preview ? (
           asset.media_type === "image" ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt={asset.original_name ?? ""} className="h-full w-full object-cover" />
+            <img src={preview} alt={asset.original_name ?? ""} loading="lazy" className="h-full w-full object-cover" />
           ) : (
             <video src={preview} className="h-full w-full object-cover" preload="metadata" />
           )
         ) : (
-          <span className="text-sm text-muted-foreground">Memuat...</span>
+          <span className="text-xs text-muted-foreground">Memuat...</span>
         )}
       </div>
-      <div className="flex items-center justify-between gap-2 p-3">
-        <p className="truncate text-sm" title={asset.original_name ?? ""}>
+      <div className="flex items-center justify-between gap-2 px-2.5 py-2">
+        <p className="truncate text-[13px]" title={asset.original_name ?? ""}>
           {asset.original_name}
         </p>
-        <Button variant="ghost" size="sm" onClick={onDelete} disabled={deleting}>
-          {deleting ? "..." : "Hapus"}
-        </Button>
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={deleting}
+          aria-label={`Hapus ${asset.original_name ?? "file"}`}
+          className="shrink-0 rounded-lg p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-[rgb(248_113_113/0.12)] hover:text-[var(--danger)] focus-visible:opacity-100 group-hover:opacity-100 disabled:opacity-50"
+        >
+          <Trash2 size={14} />
+        </button>
       </div>
     </article>
   );
@@ -133,14 +140,24 @@ export function MediaLibrary() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Input
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fileRef.current?.click()}
+          className="gap-1.5"
+        >
+          <Upload size={14} />
+          Upload
+        </Button>
+        <input
           type="file"
           ref={fileRef}
           multiple
           accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
           onChange={(e) => onFiles(e.target.files)}
-          className="max-w-xs"
+          className="hidden"
+          aria-label="Pilih file untuk diupload"
         />
         <Input
           placeholder="Cari nama file..."
@@ -149,7 +166,7 @@ export function MediaLibrary() {
             setPage(1);
             setQ(e.target.value);
           }}
-          className="max-w-xs"
+          className="max-w-52 border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)]"
         />
         <select
           value={type}
@@ -157,12 +174,14 @@ export function MediaLibrary() {
             setPage(1);
             setType(e.target.value as "" | "image" | "video");
           }}
-          className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+          aria-label="Filter tipe media"
+          className="rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-3 py-2 text-sm"
         >
           <option value="">Semua tipe</option>
           <option value="image">Gambar</option>
           <option value="video">Video</option>
         </select>
+        <span className="ml-auto text-xs text-muted-foreground tnum">{total} file</span>
       </div>
 
       {status && (
@@ -176,7 +195,7 @@ export function MediaLibrary() {
         </p>
       ))}
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {assets.map((a) => (
           <AssetCard key={a.id} asset={a} onDeleted={refresh} />
         ))}
@@ -185,27 +204,29 @@ export function MediaLibrary() {
         <p className="text-sm text-muted-foreground">Belum ada media.</p>
       )}
 
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={page <= 1}
-          onClick={() => setPage((p) => p - 1)}
-        >
-          ← Prev
-        </Button>
-        <span className="text-sm text-muted-foreground">
-          Hal {page} dari {totalPages} ({total} file)
-        </span>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
-        >
-          Next →
-        </Button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            ← Prev
+          </Button>
+          <span className="text-xs text-muted-foreground tnum">
+            {page} / {totalPages}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next →
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

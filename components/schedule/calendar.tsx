@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PlatformBadge, StatusBadge } from "@/components/content/badges";
 import {
   COMMON_TIMEZONES,
   dayKeyInTz,
@@ -147,39 +148,54 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex gap-1">
-          <Button variant={view === "month" ? "default" : "outline"} size="sm" onClick={() => setView("month")}>
-            Bulanan
-          </Button>
-          <Button variant={view === "week" ? "default" : "outline"} size="sm" onClick={() => setView("week")}>
-            Mingguan
-          </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <div
+          role="tablist"
+          aria-label="Tampilan kalender"
+          className="flex rounded-xl bg-[rgb(255_255_255/0.04)] p-1"
+        >
+          {(["month", "week"] as const).map((v) => (
+            <button
+              key={v}
+              role="tab"
+              aria-selected={view === v}
+              onClick={() => setView(v)}
+              className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                view === v
+                  ? "bg-[rgb(255_255_255/0.09)] font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {v === "month" ? "Bulanan" : "Mingguan"}
+            </button>
+          ))}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setCursor(new Date())}>
+        <Button variant="ghost" size="sm" onClick={() => setCursor(new Date())}>
           Hari ini
         </Button>
-        <Button
-          variant="outline" size="sm"
-          onClick={() => setCursor(new Date(year, month - 1, 1))}
-        >
-          ←
-        </Button>
-        <span className="text-sm font-medium">
-          {cursor.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-        </span>
-        <Button
-          variant="outline" size="sm"
-          onClick={() => setCursor(new Date(year, month + 1, 1))}
-        >
-          →
-        </Button>
-        <label className="ml-auto flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost" size="sm" aria-label="Bulan lalu"
+            onClick={() => setCursor(new Date(year, month - 1, 1))}
+          >
+            ←
+          </Button>
+          <span className="min-w-32 text-center text-sm font-medium">
+            {cursor.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+          </span>
+          <Button
+            variant="ghost" size="sm" aria-label="Bulan depan"
+            onClick={() => setCursor(new Date(year, month + 1, 1))}
+          >
+            →
+          </Button>
+        </div>
+        <label className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
           Zona waktu
           <select
             value={timezone}
             onChange={(e) => changeTimezone(e.target.value)}
-            className="rounded-lg border border-input bg-background px-2 py-1 text-sm"
+            className="rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-2 py-1.5 text-sm text-foreground"
           >
             {!COMMON_TIMEZONES.includes(timezone) && <option value={timezone}>{timezone}</option>}
             {COMMON_TIMEZONES.map((tz) => (
@@ -213,7 +229,7 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
                 key={key + day.getTime()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => onDropDay(key, e)}
-                className={`min-h-20 rounded-lg border p-1 ${inMonth ? "border-border" : "border-transparent opacity-40"}`}
+                className={`min-h-20 rounded-xl p-1.5 transition-colors ${inMonth ? "hover:bg-[rgb(255_255_255/0.025)]" : "opacity-35"}`}
               >
                 <p className="text-xs text-muted-foreground">{day.getUTCDate()}</p>
                 {dayItems.map((it) => (
@@ -227,8 +243,10 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
                       )
                     }
                     title={`${it.postTitle ?? ""} (${it.status})`}
-                    className={`mb-1 truncate rounded px-1 text-xs ${
-                      it.status === "pending" ? "cursor-grab bg-muted" : "bg-card"
+                    className={`mb-1 flex items-center gap-1 truncate rounded-lg px-1.5 py-0.5 text-xs ${
+                      it.status === "pending"
+                        ? "cursor-grab bg-[rgb(59_130_246/0.12)] text-foreground"
+                        : "bg-[rgb(255_255_255/0.04)] text-muted-foreground"
                     }`}
                   >
                     {timeInTz(new Date(it.scheduledAt), timezone)} {it.postTitle ?? "(tanpa judul)"}
@@ -251,19 +269,19 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
               );
             });
             return (
-              <section key={day.toISOString()} className="rounded-xl border border-border p-3">
-                <p className="text-sm font-medium">
+              <section key={day.toISOString()}>
+                <p className="text-sm font-medium text-muted-foreground">
                   {day.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "short" })}
                 </p>
                 {dayItems.length === 0 && (
                   <p className="text-sm text-muted-foreground">Kosong.</p>
                 )}
                 {dayItems.map((it) => (
-                  <div key={it.queueId} className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                    <span className="rounded bg-muted px-2 py-0.5 text-xs uppercase">{it.platform}</span>
-                    <span>{timeInTz(new Date(it.scheduledAt), timezone)}</span>
+                  <div key={it.queueId} className="mt-1.5 flex flex-wrap items-center gap-2 rounded-xl px-2 py-2 text-sm hover:bg-[rgb(255_255_255/0.03)]">
+                    <PlatformBadge platform={it.platform} />
+                    <span className="tnum text-muted-foreground">{timeInTz(new Date(it.scheduledAt), timezone)}</span>
                     <span className="font-medium">{it.postTitle ?? "(tanpa judul)"}</span>
-                    <span className="text-muted-foreground">· {it.status}</span>
+                    <StatusBadge status={it.status} />
                     {it.status === "pending" && (
                       <>
                         <input
@@ -288,8 +306,8 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
         </div>
       )}
 
-      <section className="space-y-3">
-        <h2 className="font-medium">Draft (belum terjadwal)</h2>
+      <section className="space-y-2">
+        <h2 className="text-sm font-medium text-muted-foreground">Draft (belum terjadwal)</h2>
         {drafts.length === 0 && (
           <p className="text-sm text-muted-foreground">Tidak ada draft.</p>
         )}

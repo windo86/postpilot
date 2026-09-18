@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { ScheduleCalendar } from "@/components/schedule/calendar";
+import { PageHeader } from "@/components/content/primitives";
 
 export default async function SchedulePage() {
   const supabase = await createClient();
@@ -17,14 +18,12 @@ export default async function SchedulePage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Scheduler</h1>
-        <p className="text-sm text-muted-foreground">
-          Seret post antar tanggal untuk reschedule. Waktu tersimpan sebagai UTC.
-        </p>
-      </header>
+    <div className="space-y-5">
+      <PageHeader
+        title="Kalender"
+        description="Seret post antar tanggal untuk reschedule."
+      />
       <ScheduleCalendar initialTimezone={tz} />
-    </main>
+    </div>
   );
 }
