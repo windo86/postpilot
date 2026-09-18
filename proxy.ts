@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = ["/login", "/register", "/reset-password", "/update-password", "/terms", "/privacy"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/reset-password", "/update-password", "/terms", "/privacy"];
 const PUBLIC_PREFIXES = ["/terms/", "/privacy/"]; // file verifikasi platform
 
 /**

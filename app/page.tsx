@@ -1,12 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHome } from "@/components/dashboard/home";
+import LandingPage from "@/components/landing";
 
-/** Dashboard dalam grup terproteksi (layout menjaga sesi). */
-export default async function DashboardPage() {
+/**
+ * Root: landing publik untuk tamu, dashboard untuk user login.
+ * (Bukan redirect — satu URL resmi untuk website/review platform.)
+ */
+export default async function RootPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
+
+  if (!user) return <LandingPage />;
   return <DashboardHome userId={user.id} email={user.email ?? ""} />;
 }
