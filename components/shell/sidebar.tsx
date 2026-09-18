@@ -30,10 +30,10 @@ function SidebarBody({
         <Image
           src="/logo.png"
           alt="PostPilot"
-          width={449}
-          height={250}
+          width={407}
+          height={145}
           priority
-          className={collapsed ? "h-7 w-auto max-w-[52px] object-contain" : "h-9 w-auto max-w-[190px] object-contain"}
+          className={collapsed ? "h-8 w-auto max-w-[56px] object-contain" : "h-10 w-auto max-w-[190px] object-contain"}
         />
       </Link>
 
