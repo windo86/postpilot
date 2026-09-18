@@ -53,7 +53,7 @@ export function createGoogleProvider(fetchImpl: FetchImpl = fetch): AIProvider {
     name: "google",
 
     async generateText(apiKey, prompt, opts?: TextOptions): Promise<string> {
-      const { parts } = await generate(apiKey, model("GOOGLE_MODEL_TEXT", "gemini-2.5-flash"), {
+      const { parts } = await generate(apiKey, model("GOOGLE_MODEL_TEXT", "gemini-3.6-flash"), {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           maxOutputTokens: opts?.maxTokens ?? 500,
