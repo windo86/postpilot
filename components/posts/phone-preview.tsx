@@ -4,16 +4,25 @@ import {
   BatteryFull,
   Bell,
   Bookmark,
+  CalendarDays,
+  Camera,
   Clapperboard,
+  Clock,
+  CloudSun,
+  Compass,
   Heart,
   Home,
+  Mail,
   MapPin,
   MessageCircle,
   MessageCircleHeart,
+  Music,
   Music2,
+  Phone,
   Plus,
   Search,
   Send,
+  Settings,
   Signal,
   SquarePlus,
   Wifi,
@@ -112,6 +121,93 @@ function StoriesRow({ username, avatarUrl }: { username: string; avatarUrl: stri
         ))}
       </div>
     </div>
+  );
+}
+
+/** Layar utama iPhone: wallpaper gelap, grid aplikasi, dock.
+ *  Ikon digambar dari bentuk iOS (gradien + glyph) — konsisten proporsi
+ *  dengan PhoneFrame yang sama. */
+export function IPhoneHomeScreen() {
+  const apps: { label: string; icon: React.ReactNode; bg: string }[] = [
+    { label: "Pesan", icon: <MessageCircle size={26} className="text-white" fill="currentColor" />, bg: "linear-gradient(180deg,#5bf160,#1fc93f)" },
+    { label: "Safari", icon: <Compass size={26} className="text-white" />, bg: "linear-gradient(180deg,#fdfdfd,#d8dce2)" },
+    { label: "Mail", icon: <Mail size={24} className="text-white" />, bg: "linear-gradient(180deg,#3b9df0,#1668dc)" },
+    { label: "Foto", icon: <Camera size={24} className="text-[#5b5b60]" />, bg: "linear-gradient(180deg,#ffffff,#e4e4e8)" },
+    { label: "Jam", icon: <Clock size={26} className="text-[#ff9f0a]" />, bg: "linear-gradient(180deg,#1c1c1e,#000000)" },
+    { label: "Cuaca", icon: <CloudSun size={26} className="text-white" />, bg: "linear-gradient(180deg,#2f7cf6,#0a84ff)" },
+    { label: "Kalender", icon: <CalendarDays size={24} className="text-[#ff3b30]" />, bg: "linear-gradient(180deg,#ffffff,#f2f2f5)" },
+    { label: "Musik", icon: <Music size={24} className="text-white" />, bg: "linear-gradient(180deg,#fc5c7d,#e8254f)" },
+    {
+      label: "Instagram",
+      icon: (
+        <span className="grid size-7 place-items-center rounded-[9px] border-[2.5px] border-white">
+          <span className="size-3 rounded-full border-[2.5px] border-white" />
+        </span>
+      ),
+      bg: "linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)",
+    },
+    {
+      label: "TikTok",
+      icon: <Music2 size={24} className="text-white" fill="currentColor" />,
+      bg: "linear-gradient(180deg,#101014,#000000)",
+    },
+    { label: "Kamera", icon: <Camera size={24} className="text-[#3a3a3c]" />, bg: "linear-gradient(180deg,#e8e8ec,#c7c7cc)" },
+    { label: "Pengaturan", icon: <Settings size={26} className="text-white" />, bg: "linear-gradient(180deg,#8e8e93,#48484a)" },
+  ];
+  const dock: { label: string; icon: React.ReactNode; bg: string }[] = [
+    { label: "Telepon", icon: <Phone size={26} className="text-white" fill="currentColor" />, bg: "linear-gradient(180deg,#5bf160,#1fc93f)" },
+    { label: "Safari", icon: <Compass size={26} className="text-white" />, bg: "linear-gradient(180deg,#fdfdfd,#d8dce2)" },
+    { label: "Pesan", icon: <MessageCircle size={24} className="text-white" fill="currentColor" />, bg: "linear-gradient(180deg,#3b9df0,#1668dc)" },
+    { label: "Musik", icon: <Music size={24} className="text-white" />, bg: "linear-gradient(180deg,#fc5c7d,#e8254f)" },
+  ];
+
+  return (
+    <PhoneFrame>
+      <div
+        className="flex h-full flex-col px-3 pb-8 pt-14"
+        style={{ background: "radial-gradient(120% 60% at 50% 0%, #1b2340 0%, #0a0d18 55%, #05060c 100%)" }}
+      >
+        {/* Widget jam */}
+        <div className="px-1 pb-2">
+          <p className="text-[11px] text-white/70">Jumat, 19 September</p>
+          <p className="text-[34px] font-bold leading-none tracking-tight text-white">09:41</p>
+        </div>
+        {/* Grid aplikasi */}
+        <div className="grid flex-1 grid-cols-4 content-start gap-x-2 gap-y-4 pt-2">
+          {apps.map((a) => (
+            <span key={a.label} className="flex flex-col items-center gap-1">
+              <span
+                className="grid size-[52px] place-items-center overflow-hidden rounded-[14px]"
+                style={{ background: a.bg }}
+              >
+                {a.icon}
+              </span>
+              <span className="text-[10px] text-white">{a.label}</span>
+            </span>
+          ))}
+        </div>
+        {/* Page dots */}
+        <div className="flex justify-center gap-1.5 pb-2">
+          <span className="size-1.5 rounded-full bg-white" />
+          <span className="size-1.5 rounded-full bg-white/35" />
+        </div>
+        {/* Dock */}
+        <div className="rounded-[26px] border border-white/10 bg-white/10 px-3 py-2.5 backdrop-blur-xl">
+          <div className="grid grid-cols-4 gap-2">
+            {dock.map((a) => (
+              <span key={a.label} className="flex flex-col items-center">
+                <span
+                  className="grid size-[52px] place-items-center overflow-hidden rounded-[14px]"
+                  style={{ background: a.bg }}
+                >
+                  {a.icon}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </PhoneFrame>
   );
 }
 
