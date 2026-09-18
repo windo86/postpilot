@@ -63,7 +63,7 @@ export function TrendChart({ platformId }: { platformId: string }) {
       .filter(Boolean)
       .join(" ");
 
-  const ticks = [0, 0.5, 1].map((f) => Math.round(max * f));
+  const ticks = [...new Set([0, 0.5, 1].map((f) => Math.round(max * f)))];
 
   return (
     <figure>
