@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = ["/login", "/register", "/reset-password", "/update-password"];
+const PUBLIC_PATHS = ["/login", "/register", "/reset-password", "/update-password", "/terms", "/privacy"];
 
 /**
  * Auth guard: semua route butuh sesi, kecuali halaman auth publik
