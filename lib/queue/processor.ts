@@ -14,6 +14,15 @@ import {
   sanitizeInstagramResponse,
   InstagramApiError,
 } from "@/lib/platforms/instagram/publish";
+import {
+  buildTikTokTitle,
+  fetchCreatorInfo,
+  fetchPublishStatus,
+  initVideoDirectPost,
+  splitChunks,
+  uploadVideoChunk,
+  TikTokApiError,
+} from "@/lib/platforms/tiktok/publish";
 import { claimDueJobs, recoverStaleJobs, type ClaimedJob } from "./claim";
 import {
   MAX_ATTEMPTS,
@@ -32,7 +41,10 @@ import { sendFailureEmail } from "@/lib/notifications/email";
 
 const SIGNED_URL_SECONDS = 7200;
 const STATUS_POLL_MS = 5000;
-const STATUS_POLL_ROUNDS = 24; // ±2 menit
+const STATUS_POLL_ROUNDS = 24; // ±2 menit (Instagram)
+const TIKTOK_POLL_MS = 10000;
+const TIKTOK_POLL_ROUNDS = 30; // ±5 menit
+const TIKTOK_CHUNK_BYTES = 10 * 1024 * 1024;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -468,16 +480,110 @@ export async function processJob(client: SupabaseClient, job: ClaimedJob): Promi
   }
 
   try {
-    if (platform.platform === "tiktok") {
-      // T-10 belum implementasi: gagal permanent dengan pesan jelas, tanpa retry buta.
-      throw new Error("TikTok publishing belum tersedia (T-10). Hubungkan ulang setelah rilis.");
-    }
-    const platformPostId = await runInstagramPublish(client, job, platform, account, media, token);
+    const platformPostId =
+      platform.platform === "tiktok"
+        ? await runTikTokPublish(client, job, platform, account, media, token)
+        : await runInstagramPublish(client, job, platform, account, media, token);
     await finalizeSuccess(client, job, platform, post.user_id, platformPostId);
   } catch (e) {
     const kind = classifyFailure(e);
     await finalizeFailure(client, job, platform, post.user_id, kind, op, e, Date.now() - started);
   }
+}
+
+/**
+ * TikTok direct post video (FILE_UPLOAD). Idempotent resume via
+ * `platform_metadata.tiktok_publish_id`: init+upload sekali, polling
+ * status dilanjutkan attempt berikutnya bila masih processing.
+ */
+async function runTikTokPublish(
+  client: SupabaseClient,
+  job: ClaimedJob,
+  platform: PlatformRow,
+  account: AccountRow,
+  media: MediaRow[],
+  token: string
+): Promise<string> {
+  if (media.length !== 1 || media[0].media_type !== "video") {
+    throw new TikTokApiError("TikTok photo post menyusul — saat ini video saja", 400, null, "permanent");
+  }
+  const video = media[0];
+  const meta = platform.platform_metadata ?? {};
+
+  const creator = await logTimed(client, job, "tiktok_creator_info", () =>
+    fetchCreatorInfo(token)
+  );
+  const privacy = platform.privacy_level ?? creator.privacyOptions[0] ?? "SELF_ONLY";
+  if (!creator.privacyOptions.includes(privacy)) {
+    throw new TikTokApiError(
+      `Privacy "${privacy}" tidak tersedia untuk akun ini (${creator.privacyOptions.join(", ")})`,
+      400, null, "permanent"
+    );
+  }
+
+  let publishId = meta.tiktok_publish_id as string | undefined;
+  if (!publishId) {
+    const { data: blob, error: dlError } = await client.storage
+      .from(video.storage_bucket)
+      .download(video.storage_path);
+    if (dlError || !blob) {
+      throw new Error(`Unduh video gagal: ${dlError?.message ?? "unknown"}`);
+    }
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const chunks = splitChunks(bytes.length, TIKTOK_CHUNK_BYTES);
+    const title = buildTikTokTitle(platform.caption, platform.hashtags ?? []);
+    const init = await logTimed(client, job, "tiktok_init", () =>
+      initVideoDirectPost(token, {
+        title,
+        privacyLevel: privacy,
+        videoSize: bytes.length,
+        chunkSize: bytes.length <= 5 * 1024 * 1024 ? bytes.length : TIKTOK_CHUNK_BYTES,
+        totalChunks: chunks.length,
+      })
+    );
+    for (const c of chunks) {
+      const part = bytes.subarray(c.first, c.last + 1);
+      await logTimed(client, job, "tiktok_chunk", () =>
+        uploadVideoChunk(init.uploadUrl, video.mime_type ?? "video/mp4", part, c.first, c.last, bytes.length)
+      );
+    }
+    publishId = init.publishId;
+    await client
+      .from("post_platforms")
+      .update({
+        platform_metadata: { ...meta, tiktok_publish_id: publishId },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", platform.id);
+  }
+
+  let result = await fetchPublishStatus(token, publishId);
+  for (let i = 0; i < TIKTOK_POLL_ROUNDS && result.status !== "PUBLISH_COMPLETE" && result.status !== "FAILED"; i++) {
+    await sleep(TIKTOK_POLL_MS);
+    result = await fetchPublishStatus(token, publishId);
+  }
+  await logAttempt(client, {
+    queueId: job.id,
+    attemptNumber: job.attempt_count,
+    operation: "tiktok_status",
+    result: result.status === "PUBLISH_COMPLETE" ? "succeeded" : "failed",
+    errorCode: result.failReason,
+    responseJson: { status: result.status, share_url: result.shareUrl },
+  });
+
+  if (result.status === "PUBLISH_COMPLETE") {
+    return result.publicPostIds[0] ?? publishId;
+  }
+  if (result.status === "FAILED") {
+    const transient = result.failReason === "internal";
+    throw new TikTokApiError(
+      `TikTok publish gagal: ${result.failReason ?? "unknown"}`,
+      transient ? 500 : 400,
+      result.failReason,
+      transient ? "transient" : "permanent"
+    );
+  }
+  throw new TikTokApiError("TikTok masih processing — lanjutkan polling", 504, null, "transient");
 }
 
 /** Satu iterasi worker: recovery → claim → proses berurutan. */

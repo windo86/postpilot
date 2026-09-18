@@ -29,7 +29,13 @@ interface TargetDraft {
   privacyLevel: string;
 }
 
-const TIKTOK_PRIVACY = [
+interface CreatorInfo {
+  nickname: string | null;
+  privacyOptions: string[];
+  maxVideoDurationSeconds: number;
+}
+
+const TIKTOK_PRIVACY_FALLBACK = [
   "PUBLIC_TO_EVERYONE",
   "MUTUAL_FOLLOW_FRIENDS",
   "FOLLOWER_OF_CREATOR",
@@ -44,6 +50,7 @@ export function Composer() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [drafts, setDrafts] = useState<Record<string, TargetDraft>>({});
+  const [creatorInfo, setCreatorInfo] = useState<Record<string, CreatorInfo>>({});
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -97,6 +104,20 @@ export function Composer() {
           privacyLevel: "PUBLIC_TO_EVERYONE",
         },
       }));
+      // Privacy options asli dari TikTok API (bukan tebakan statis).
+      const acc = accounts.find((a) => a.id === id);
+      if (acc?.platform === "tiktok") {
+        fetch(`/api/tiktok/creator-info?accountId=${id}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((j) => {
+            if (!j || !Array.isArray(j.privacyOptions) || j.privacyOptions.length === 0) return;
+            setCreatorInfo((c) => ({ ...c, [id]: j }));
+            setDrafts((d) =>
+              d[id] ? { ...d, [id]: { ...d[id], privacyLevel: j.privacyOptions[0] } } : d
+            );
+          })
+          .catch(() => undefined);
+      }
       return [...s, id];
     });
   }
@@ -276,19 +297,21 @@ export function Composer() {
                       Konten komersial / sponsored
                     </label>
                     <label className="block text-sm">
-                      Privacy
+                      Privacy{creatorInfo[accId] ? ` (${creatorInfo[accId].nickname ?? "akun TikTok"})` : ""}
                       <select
                         value={d.privacyLevel}
                         onChange={(e) => patchDraft(accId, { privacyLevel: e.target.value })}
                         className="ml-2 rounded-lg border border-input bg-background px-2 py-1 text-sm"
                       >
-                        {TIKTOK_PRIVACY.map((p) => (
+                        {(creatorInfo[accId]?.privacyOptions ?? TIKTOK_PRIVACY_FALLBACK).map((p) => (
                           <option key={p} value={p}>{p}</option>
                         ))}
                       </select>
                     </label>
                     <p className="text-xs text-muted-foreground">
-                      Privacy divalidasi ulang dari creator info saat publish.
+                      {creatorInfo[accId]
+                        ? `Opsi asli dari TikTok · maks ${creatorInfo[accId].maxVideoDurationSeconds} dtk.`
+                        : "Memuat opsi dari TikTok... (fallback bila gagal, divalidasi ulang saat publish)."}
                     </p>
                   </>
                 )}
