@@ -37,15 +37,15 @@ function SidebarBody({
         />
       </Link>
 
-      <nav aria-label="Navigasi utama" className="flex-1 space-y-4 overflow-y-auto p-2">
+      <nav aria-label="Navigasi utama" className="flex-1 space-y-5 overflow-y-auto px-2.5 py-3">
         {NAV_GROUPS.map((group) => (
           <div key={group.title}>
             {!collapsed && (
-              <p className="px-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground">
+              <p className="px-2.5 pb-1.5 text-[11px] font-medium tracking-wide text-muted-foreground">
                 {group.title}
               </p>
             )}
-            <ul className="space-y-0.5">
+            <ul className="space-y-1">
               {group.entries.map((entry) => {
                 const active = isActive(pathname, entry.href);
                 const Icon = entry.icon;

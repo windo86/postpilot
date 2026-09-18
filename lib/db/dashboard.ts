@@ -7,13 +7,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface DashboardSummary {
   counts: { draft: number; scheduled: number; published: number; failed: number };
-  recentPosts: { id: string; title: string | null; status: string; created_at: string }[];
+  recentPosts: {
+    id: string; title: string | null; status: string; created_at: string;
+    thumbnailAssetId: string | null; thumbnailType: string | null;
+  }[];
   upcoming: {
     queueId: string;
     postId: string;
     postTitle: string | null;
     platform: string;
     scheduledAt: string;
+    thumbnailAssetId: string | null;
+    thumbnailType: string | null;
   }[];
   connections: { platform: string; username: string | null; status: string }[];
   failures: { id: string; title: string; message: string; created_at: string }[];
@@ -42,6 +47,24 @@ export async function getDashboardSummary(
   const postIds = postRows.map((p) => p.id);
   const titleByPost = new Map(postRows.map((p) => [p.id, p.title]));
 
+  // Thumbnail: media pertama tiap post (untuk upcoming + recent).
+  const thumbByPost = new Map<string, { assetId: string; mediaType: string }>();
+  if (postIds.length > 0) {
+    const { data: links } = await client
+      .from("post_media")
+      .select("post_id,position,media_assets(id,media_type)")
+      .in("post_id", postIds)
+      .order("position");
+    for (const l of ((links ?? []) as unknown as {
+      post_id: string;
+      media_assets: { id: string; media_type: string } | { id: string; media_type: string }[] | null;
+    }[])) {
+      if (thumbByPost.has(l.post_id)) continue;
+      const m = Array.isArray(l.media_assets) ? l.media_assets[0] : l.media_assets;
+      if (m) thumbByPost.set(l.post_id, { assetId: m.id, mediaType: m.media_type });
+    }
+  }
+
   let upcoming: DashboardSummary["upcoming"] = [];
   if (postIds.length > 0) {
     const { data: plats } = await client
@@ -69,6 +92,8 @@ export async function getDashboardSummary(
             postTitle: titleByPost.get(info.post_id) ?? null,
             platform: info.platform,
             scheduledAt: q.scheduled_at,
+            thumbnailAssetId: thumbByPost.get(info.post_id)?.assetId ?? null,
+            thumbnailType: thumbByPost.get(info.post_id)?.mediaType ?? null,
           };
         });
     }
@@ -102,7 +127,11 @@ export async function getDashboardSummary(
 
   return {
     counts,
-    recentPosts: postRows.slice(0, 5),
+    recentPosts: postRows.slice(0, 5).map((p) => ({
+      ...p,
+      thumbnailAssetId: thumbByPost.get(p.id)?.assetId ?? null,
+      thumbnailType: thumbByPost.get(p.id)?.mediaType ?? null,
+    })),
     upcoming,
     connections: ((conns ?? []) as { platform: string; username: string | null; status: string }[]),
     failures: ((notifs ?? []) as { id: string; title: string; message: string; created_at: string }[]),

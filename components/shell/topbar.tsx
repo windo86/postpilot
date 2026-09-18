@@ -57,7 +57,7 @@ export function Topbar({ email, onMenu }: { email: string; onMenu: () => void })
           <button
             type="button"
             onClick={() => window.dispatchEvent(new Event("postpilot:command"))}
-            className="hidden items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-[rgb(255_255_255/0.16)] hover:text-foreground sm:flex"
+            className="hidden w-56 items-center gap-2 rounded-xl border border-[rgb(255_255_255/0.07)] bg-[rgb(255_255_255/0.03)] px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-[rgb(255_255_255/0.14)] hover:text-foreground sm:flex"
           >
             <Search size={14} />
             <span>Cari / perintah</span>
