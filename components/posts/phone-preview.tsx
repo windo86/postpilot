@@ -134,9 +134,12 @@ export function InstagramPreview({
       <div className="flex h-full flex-col bg-black text-white">
         {/* Header aplikasi */}
         <div className="flex items-center px-4 pb-1 pt-12">
-          <span className="font-serif text-[22px] italic tracking-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-            Instagram
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/ig-wordmark.jpg"
+            alt="Instagram"
+            className="h-6 w-auto invert mix-blend-screen"
+          />
           <span className="ml-auto flex items-center gap-5">
             <span className="relative">
               <Bell size={24} strokeWidth={1.8} />
