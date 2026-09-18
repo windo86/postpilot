@@ -63,7 +63,12 @@ export async function refreshPlatformMetrics(
 /**
  * Worker pass: refresh snapshot basi (atau belum ada) untuk target IG
  * published, maksimal `limit` per iterasi. TikTok dilewati (T-10).
+ * Platform yang gagal refresh di-skip 1 jam (cooldown in-memory) agar
+ * log tidak spam setiap iterasi.
  */
+const lastFailureAt = new Map<string, number>();
+const FAILURE_COOLDOWN_MS = 3600 * 1000;
+
 export async function refreshStaleAnalytics(
   client: SupabaseClient,
   limit = 5
@@ -82,10 +87,16 @@ export async function refreshStaleAnalytics(
   let done = 0;
   for (const row of ((data ?? []) as { id: string }[])) {
     if (done >= limit) break;
+    const failedAt = lastFailureAt.get(row.id) ?? 0;
+    if (Date.now() - failedAt < FAILURE_COOLDOWN_MS) continue;
     try {
       const outcome = await refreshPlatformMetrics(client, row.id);
-      if (outcome.status === "refreshed") done++;
+      if (outcome.status === "refreshed") {
+        done++;
+        lastFailureAt.delete(row.id);
+      }
     } catch (e) {
+      lastFailureAt.set(row.id, Date.now());
       console.error(`[worker] analytics ${row.id} gagal: ${(e as Error).message}`);
     }
   }
