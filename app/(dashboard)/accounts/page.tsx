@@ -51,7 +51,7 @@ export default async function AccountsPage({
 
       {query.connected && (
         <p role="status" className="rounded-lg border border-border bg-card p-3 text-sm">
-          Akun {query.connected} berhasil terhubung. 🎉
+          Akun {query.connected} berhasil terhubung.
         </p>
       )}
       {query.disconnected && (

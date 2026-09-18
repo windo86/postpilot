@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Bell } from "lucide-react";
 
 /** Bell notifikasi + badge unread. */
 export function NotificationBell() {
@@ -31,11 +32,11 @@ export function NotificationBell() {
     <Link
       href="/notifications"
       aria-label={`Notifikasi (${unread} belum dibaca)`}
-      className="relative rounded-lg border border-input px-3 py-2 text-sm"
+      className="relative rounded-lg p-2 text-muted-foreground hover:bg-[rgb(255_255_255/0.06)] hover:text-foreground"
     >
-      🔔
+      <Bell size={18} />
       {unread > 0 && (
-        <span className="absolute -right-2 -top-2 rounded-full bg-destructive px-1.5 text-xs text-white">
+        <span className="absolute -right-0.5 -top-0.5 grid min-h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-[10px] font-medium text-white">
           {unread > 99 ? "99+" : unread}
         </span>
       )}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Film, Image as ImageIcon, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { uploadFile } from "@/components/media/upload-file";
@@ -217,12 +218,12 @@ export function Composer() {
                   key={m.id}
                   type="button"
                   onClick={() => toggleMedia(m.id)}
-                  className={`truncate rounded-lg border p-2 text-left text-xs ${
+                  className={`flex items-center gap-1.5 truncate rounded-lg border p-2 text-left text-xs ${
                     active ? "border-primary bg-muted" : "border-border"
                   }`}
                   title={m.original_name ?? ""}
                 >
-                  {m.media_type === "video" ? "🎬 " : "🖼️ "}
+                  {m.media_type === "video" ? <Film size={13} /> : <ImageIcon size={13} />}
                   {m.original_name}
                 </button>
               );
@@ -361,7 +362,7 @@ export function Composer() {
               <p className="mt-2 whitespace-pre-wrap text-sm">{d.caption || "(tanpa caption)"}</p>
               {d.hashtags && <p className="text-sm text-primary">{d.hashtags}</p>}
               {acc.platform === "tiktok" && d.commercialDisclosure && (
-                <p className="mt-1 text-xs text-muted-foreground">🔖 Konten komersial · {d.privacyLevel}</p>
+                <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Tag size={12} /> Konten komersial · {d.privacyLevel}</p>
               )}
             </article>
           );

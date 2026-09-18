@@ -1,4 +1,12 @@
 import Link from "next/link";
+import { CalendarDays, Image as ImageIcon, PenLine, Sparkles } from "lucide-react";
+
+const FEATURES = [
+  { icon: PenLine, title: "Composer", desc: "Caption per platform, preview, dan validasi otomatis." },
+  { icon: CalendarDays, title: "Scheduler", desc: "Kalender drag-and-drop dengan queue + retry andal." },
+  { icon: ImageIcon, title: "Media Library", desc: "Upload sekali, pakai berulang kali." },
+  { icon: Sparkles, title: "AI Generator", desc: "Caption, gambar, dan video dari API key milikmu." },
+];
 
 /** Landing publik PostPilot (official website untuk review platform). */
 export default function LandingPage() {
@@ -36,15 +44,13 @@ export default function LandingPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        {[
-          ["📝 Composer", "Caption per platform, preview, dan validasi otomatis."],
-          ["🗓️ Scheduler", "Kalender drag-and-drop dengan queue + retry andal."],
-          ["🖼️ Media Library", "Upload sekali, pakai berulang kali."],
-          ["🤖 AI Generator", "Caption, gambar, dan video dari API key milikmu."],
-        ].map(([title, desc]) => (
-          <div key={title} className="rounded-xl border border-border bg-card p-4">
-            <p className="font-medium">{title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+        {FEATURES.map((f) => (
+          <div key={f.title} className="rounded-xl border border-border bg-card p-4">
+            <p className="flex items-center gap-2 font-medium">
+              <f.icon size={16} className="text-accent" />
+              {f.title}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
           </div>
         ))}
       </section>
