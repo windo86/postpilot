@@ -82,7 +82,8 @@ export async function exchangeInstagramCode(
   const short = (await shortRes.json()) as {
     access_token: string;
     user_id: string | number;
-    permissions?: string;
+    // API baru mengembalikan array, dokumentasi lama string csv.
+    permissions?: string | string[];
   };
 
   const longParams = new URLSearchParams({
@@ -99,11 +100,22 @@ export async function exchangeInstagramCode(
     expires_in: number;
   };
 
+  const rawPerms = short.permissions;
+  const scopes = (
+    Array.isArray(rawPerms)
+      ? rawPerms
+      : typeof rawPerms === "string"
+        ? rawPerms.split(",")
+        : []
+  )
+    .map((s) => String(s).trim())
+    .filter(Boolean);
+
   return {
     accessToken: long.access_token,
     expiresAt: new Date(Date.now() + long.expires_in * 1000),
     platformAccountId: String(short.user_id),
-    scopes: (short.permissions ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+    scopes,
   };
 }
 

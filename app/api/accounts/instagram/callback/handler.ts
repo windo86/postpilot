@@ -53,8 +53,20 @@ export async function handleInstagramCallback(request: NextRequest) {
 
   try {
     const cfg = instagramConfigFromEnv();
-    const tokens = await exchangeInstagramCode(cfg, code);
-    const profile = await fetchInstagramProfile(tokens.accessToken);
+    let tokens;
+    try {
+      tokens = await exchangeInstagramCode(cfg, code);
+    } catch (e) {
+      console.error("[ig-oauth] code exchange gagal:", (e as Error).message);
+      return fail(origin, "exchange");
+    }
+    let profile;
+    try {
+      profile = await fetchInstagramProfile(tokens.accessToken);
+    } catch (e) {
+      console.error("[ig-oauth] profile fetch gagal:", (e as Error).message);
+      return fail(origin, "exchange");
+    }
 
     await upsertConnection(supabase, {
       userId: user.id,
