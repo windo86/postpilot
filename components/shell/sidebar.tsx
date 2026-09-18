@@ -33,7 +33,7 @@ function SidebarBody({
           width={407}
           height={145}
           priority
-          className={collapsed ? "h-8 w-auto max-w-[56px] object-contain" : "h-10 w-auto max-w-[190px] object-contain"}
+          className={collapsed ? "h-8 w-auto max-w-[56px] object-contain" : "h-11 w-auto max-w-[200px] object-contain"}
         />
       </Link>
 
