@@ -63,14 +63,15 @@ export function AIKeyManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
-        <h2 className="font-medium">Tambah API key (milikmu sendiri)</h2>
+    <div className="space-y-3">
+      <div className="space-y-2.5 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
+        <h3 className="text-sm font-medium">Tambah API key (milikmu sendiri)</h3>
         <div className="flex flex-wrap gap-2">
           <select
             value={provider}
             onChange={(e) => setProvider(e.target.value as "openai" | "google")}
-            className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            aria-label="Provider AI"
+            className="rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-3 py-2 text-sm"
           >
             <option value="openai">OpenAI</option>
             <option value="google">Google (Gemini/Veo)</option>
@@ -79,7 +80,7 @@ export function AIKeyManager() {
             placeholder="Label (opsional)"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            className="max-w-xs"
+            className="max-w-xs border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)]"
           />
         </div>
         <Input
@@ -88,6 +89,7 @@ export function AIKeyManager() {
           value={rawKey}
           onChange={(e) => setRawKey(e.target.value)}
           autoComplete="off"
+          className="border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] font-mono"
         />
         {error && (
           <p role="alert" className="text-sm text-destructive">
@@ -102,16 +104,16 @@ export function AIKeyManager() {
         </p>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-1">
         {keys.map((k) => (
           <li
             key={k.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-2 py-2.5 hover:bg-[rgb(255_255_255/0.03)]"
           >
             <div className="text-sm">
-              <span className="mr-2 rounded bg-muted px-2 py-0.5 text-xs uppercase">{k.provider}</span>
+              <span className="mr-2 rounded-full bg-[rgb(255_255_255/0.07)] px-2 py-0.5 text-[11px] uppercase text-muted-foreground">{k.provider}</span>
               {k.label ?? "—"}
-              <span className="ml-2 font-mono text-muted-foreground">••••{k.key_last4}</span>
+              <span className="ml-2 font-mono text-xs text-muted-foreground">••••{k.key_last4}</span>
             </div>
             <Button size="sm" variant="ghost" onClick={() => onDelete(k.id)}>
               Hapus

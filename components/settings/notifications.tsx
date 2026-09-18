@@ -33,17 +33,40 @@ export function NotificationPreferences() {
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-      <h2 className="font-medium">Preferensi notifikasi</h2>
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={inApp} onChange={(e) => setInApp(e.target.checked)} />
-        Notifikasi dalam aplikasi
-      </label>
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} />
-        Email untuk kegagalan penting
-      </label>
-      <div className="flex items-center gap-2">
+    <div className="space-y-1 rounded-2xl border border-[rgb(255_255_255/0.07)] p-2" style={{ background: "var(--surface)" }}>
+      {(
+        [
+          { label: "Notifikasi dalam aplikasi", desc: "Bell + halaman notifikasi", value: inApp, set: setInApp },
+          { label: "Email kegagalan penting", desc: "Hanya saat publish gagal permanen", value: email, set: setEmail },
+        ] as const
+      ).map((row) => (
+        <div key={row.label} className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5">
+          <div>
+            <p className="text-sm">{row.label}</p>
+            <p className="text-xs text-muted-foreground">{row.desc}</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={row.value}
+            aria-label={row.label}
+            onClick={() => {
+              row.set(!row.value);
+              setSaved(false);
+            }}
+            className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+              row.value ? "bg-[var(--accent)]" : "bg-[rgb(255_255_255/0.14)]"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${
+                row.value ? "left-[22px]" : "left-0.5"
+              }`}
+            />
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center gap-2 px-2 pb-1 pt-2">
         <Button size="sm" onClick={onSave} disabled={busy}>
           {busy ? "Menyimpan..." : "Simpan"}
         </Button>
