@@ -13,6 +13,7 @@ import { assertEncryptionKeyConfigured } from "@/lib/crypto";
 import { createServiceClient } from "@/lib/supabase/service-client";
 import { runWorkerIteration } from "@/lib/queue/processor";
 import { refreshDueTokens } from "@/lib/queue/token-refresh";
+import { refreshStaleAnalytics } from "@/lib/analytics/refresh";
 
 /** Muat .env.local (Next.js melakukannya otomatis; Node biasa tidak). */
 function loadEnvFile(path = ".env.local"): void {
@@ -72,8 +73,14 @@ async function main(): Promise<void> {
         console.log(`[worker] token: refreshed=${tokens.refreshed} reauth=${tokens.reauth}`);
       }
       const { recovered, claimed } = await runWorkerIteration(client, workerId, claimLimit);
-      if (claimed > 0 || recovered > 0) {
-        console.log(`[worker] iterasi: claimed=${claimed} recovered=${recovered} (${Date.now() - started}ms)`);
+      const analytics = await refreshStaleAnalytics(client).catch((e) => {
+        console.error(`[worker] analytics gagal: ${(e as Error).message}`);
+        return 0;
+      });
+      if (claimed > 0 || recovered > 0 || analytics > 0) {
+        console.log(
+          `[worker] iterasi: claimed=${claimed} recovered=${recovered} analytics=${analytics} (${Date.now() - started}ms)`
+        );
       }
     } catch (e) {
       console.error(`[worker] iterasi gagal: ${(e as Error).message}`);
