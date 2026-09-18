@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight, X } from "lucide-react";
-import { NAV_GROUPS } from "@/components/shell/nav";
+import { NAV_GROUPS, activeHrefForPath } from "@/components/shell/nav";
 import { cn } from "cn";
 
 function isActive(pathname: string, href: string): boolean {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  return activeHrefForPath(pathname) === href;
 }
 
 function SidebarBody({

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Film, Image as ImageIcon, Tag } from "lucide-react";
+import { Film, Image as ImageIcon, Smartphone, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { uploadFile } from "@/components/media/upload-file";
@@ -331,10 +331,18 @@ export function Composer() {
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
         <h2 className="font-medium">Preview</h2>
         {selectedAccounts.length === 0 && (
-          <p className="text-sm text-muted-foreground">Pilih akun untuk preview.</p>
+          <div className="mx-auto w-full max-w-[300px] rounded-[2rem] border border-border bg-card p-3">
+            <div className="mx-auto mb-3 h-1.5 w-24 rounded-full bg-muted" />
+            <div className="flex aspect-[9/16] flex-col items-center justify-center gap-2 rounded-2xl bg-muted text-center">
+              <Smartphone size={28} className="text-muted-foreground" />
+              <p className="px-6 text-sm text-muted-foreground">
+                Pilih media & akun — preview tampil seperti di HP.
+              </p>
+            </div>
+          </div>
         )}
         {selectedAccounts.map((accId) => {
           const acc = accounts.find((a) => a.id === accId);

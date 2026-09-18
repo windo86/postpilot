@@ -67,15 +67,31 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-/** Judul konteks topbar dari path. */
-export function titleForPath(pathname: string): string {
+/** Entry dengan href terpanjang yang cocok — hanya satu yang aktif. */
+export function activeHrefForPath(pathname: string): string | null {
+  let best: string | null = null;
   for (const g of NAV_GROUPS) {
     for (const e of g.entries) {
-      if (e.href === "/" ? pathname === "/" : pathname === e.href || pathname.startsWith(e.href + "/")) {
-        return e.label;
+      const match =
+        e.href === "/" ? pathname === "/" : pathname === e.href || pathname.startsWith(e.href + "/");
+      if (match && (!best || e.href.length > best.length)) {
+        best = e.href;
       }
     }
   }
+  return best;
+}
+
+/** Judul konteks topbar dari path. */
+export function titleForPath(pathname: string): string {
+  const active = activeHrefForPath(pathname);
+  if (active) {
+    for (const g of NAV_GROUPS) {
+      const found = g.entries.find((e) => e.href === active);
+      if (found) return found.label;
+    }
+  }
   if (pathname.startsWith("/notifications")) return "Notifications";
+  if (pathname.startsWith("/posts/")) return "Post Detail";
   return "PostPilot";
 }
