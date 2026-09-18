@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight, X } from "lucide-react";
@@ -23,15 +24,17 @@ function SidebarBody({
       <Link
         href="/"
         onClick={onNavigate}
-        className={cn(
-          "flex h-14 items-center gap-2 border-b border-sidebar-border px-4",
-          collapsed && "justify-center px-0"
-        )}
+        aria-label="PostPilot"
+        className="flex h-14 items-center justify-center border-b border-sidebar-border px-3"
       >
-        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-accent text-sm font-bold text-white">
-          P
-        </span>
-        {!collapsed && <span className="font-semibold tracking-tight">PostPilot</span>}
+        <Image
+          src="/logo.png"
+          alt="PostPilot"
+          width={449}
+          height={250}
+          priority
+          className={collapsed ? "h-7 w-auto max-w-[52px] object-contain" : "h-9 w-auto max-w-[190px] object-contain"}
+        />
       </Link>
 
       <nav aria-label="Navigasi utama" className="flex-1 space-y-4 overflow-y-auto p-2">
