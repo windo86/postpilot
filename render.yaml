@@ -1,0 +1,70 @@
+# PostPilot — Render blueprint: 1 Web Service + 1 Background Worker.
+# Deploy: hubungkan repo GitHub → Render → New → Blueprint → pilih render.yaml.
+# Secrets diisi manual di dashboard Render (jangan commit!).
+services:
+  - type: web
+    name: postpilot-web
+    region: singapore
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false # https://postpilot-web.onrender.com (isi setelah deploy)
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APP_ENCRYPTION_KEY
+        sync: false # 64 hex char — generate baru untuk produksi!
+      - key: INSTAGRAM_CLIENT_ID
+        sync: false
+      - key: INSTAGRAM_CLIENT_SECRET
+        sync: false
+      - key: INSTAGRAM_REDIRECT_URI
+        sync: false
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
+      - key: TIKTOK_REDIRECT_URI
+        sync: false
+      - key: MEDIA_BUCKET
+        value: media
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+
+  - type: worker
+    name: postpilot-worker
+    region: singapore
+    runtime: node
+    buildCommand: npm ci
+    startCommand: npm run worker
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APP_ENCRYPTION_KEY
+        sync: false # SAMA dengan web (token terenkripsi dibaca dua sisi)
+      - key: MEDIA_BUCKET
+        value: media
+      - key: WORKER_POLL_INTERVAL_MS
+        value: "5000"
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
