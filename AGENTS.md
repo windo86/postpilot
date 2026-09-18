@@ -40,6 +40,10 @@
 - `lib/supabase/server.ts` — SSR cookie flow for Server Components/Actions/Routes.
 - `lib/supabase/service.ts` — service-role, bypasses RLS. Server/worker only,
   enforced by the `server-only` package. Never expose to the browser.
+- `lib/supabase/service-client.ts` — same factory WITHOUT `server-only`
+  (the package throws under plain Node). Worker imports this one; app code
+  imports `./service`. Worker also loads `.env.local` itself via a tiny
+  parser in `worker/index.ts` (Next.js does it automatically, tsx does not).
 
 ## Env
 
@@ -65,6 +69,7 @@
 
 Order: `npm run typecheck` → `npm run lint` → `npm run build`.
 Worker smoke test: `WORKER_POLL_INTERVAL_MS=1000 npm run worker` must print
-`[worker] starting` + ticks (kill it after — it runs forever by design).
+`[worker] starting` (it idles silently when queue empty, logs on activity;
+kill it after — it runs forever by design).
 `npm run dev` for UI work. No test runner configured yet (vitest/playwright
 arrive with later tasks — follow Tech Spec §20 when adding).
