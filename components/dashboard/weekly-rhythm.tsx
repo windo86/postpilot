@@ -39,7 +39,7 @@ export function WeeklyRhythm() {
   const todayIdx = (new Date().getDay() + 6) % 7;
 
   return (
-    <section aria-label="Ritme posting mingguan">
+    <section aria-label="Ritme posting mingguan" className="glass-panel rounded-2xl px-4 py-3">
       <h2 className="text-sm font-medium text-muted-foreground">Ritme minggu ini</h2>
       <div className="mt-2 grid grid-cols-7 gap-1">
         {(counts ?? [0, 0, 0, 0, 0, 0, 0]).map((n, i) => (

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CalendarPlus, Plus } from "lucide-react";
+import { ArrowRight, AlertTriangle, CalendarClock, CalendarPlus, CheckCircle2, FileText, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardSummary } from "@/lib/db/dashboard";
 import { PageHeader, EmptyState } from "@/components/content/primitives";
@@ -49,7 +49,16 @@ export async function DashboardHome({
   );
 
   return (
-    <div className="space-y-7">
+    <div className="relative space-y-7">
+      {/* Hero band: glow lokal, bukan card berat */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-6 left-1/2 h-56 w-[110%] -translate-x-1/2"
+        style={{
+          background:
+            "radial-gradient(52% 100% at 30% 0%, rgb(59 130 246 / 0.14) 0%, transparent 70%), radial-gradient(40% 90% at 78% 10%, rgb(167 139 250 / 0.10) 0%, transparent 70%)",
+        }}
+      />
       {/* Header */}
       <PageHeader
         title={`Halo, ${firstName}`}
@@ -64,16 +73,17 @@ export async function DashboardHome({
         </Link>
       </PageHeader>
 
-      {/* Activity strip: satu baris, separator halus */}
+      {/* Activity strip: satu panel kaca, ikon + separator */}
       <section aria-label="Ringkasan aktivitas">
-        <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
+        <dl className="glass-panel flex flex-wrap items-center gap-x-7 gap-y-3 rounded-2xl px-5 py-4">
           {[
-            { label: "Draft", value: summary.counts.draft },
-            { label: "Terjadwal", value: summary.counts.scheduled },
-            { label: "Terbit", value: summary.counts.published },
-            { label: "Gagal", value: summary.counts.failed },
-          ].map((s) => (
-            <div key={s.label} className="flex items-baseline gap-2">
+            { label: "Draft", value: summary.counts.draft, icon: FileText },
+            { label: "Terjadwal", value: summary.counts.scheduled, icon: CalendarClock },
+            { label: "Terbit", value: summary.counts.published, icon: CheckCircle2 },
+            { label: "Gagal", value: summary.counts.failed, icon: AlertTriangle },
+          ].map((s, i) => (
+            <div key={s.label} className={`flex items-center gap-2.5 ${i > 0 ? "sm:border-l sm:border-white/8 sm:pl-7" : ""}`}>
+              <s.icon size={16} className="text-muted-foreground" />
               <dt className="text-sm text-muted-foreground">{s.label}</dt>
               <dd className="tnum text-xl font-semibold tracking-tight">{s.value}</dd>
             </div>
@@ -111,10 +121,10 @@ export async function DashboardHome({
                         assetId={u.thumbnailAssetId}
                         mediaType={u.thumbnailType ?? "image"}
                         alt={u.postTitle ?? "Thumbnail post"}
-                        className="size-12 shrink-0 rounded-lg"
+                        className="size-14 shrink-0 rounded-xl"
                       />
                     ) : (
-                      <span className="size-12 shrink-0 rounded-lg bg-[rgb(255_255_255/0.04)]" aria-hidden />
+                      <span className="size-14 shrink-0 rounded-xl bg-[rgb(255_255_255/0.04)]" aria-hidden />
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">

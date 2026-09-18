@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Image as ImageIcon } from "lucide-react";
 
 /** Thumbnail media dari signed preview URL (lazy per item). */
@@ -61,14 +61,20 @@ export function Sparkline({
   stroke?: string;
   label: string;
 }) {
+  const gid = `spark-${useId().replace(/:/g, "")}`;
   if (values.length < 2) return null;
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
   const span = max - min || 1;
   const stepX = width / (values.length - 1);
-  const d = values
-    .map((v, i) => `${i === 0 ? "M" : "L"}${(i * stepX).toFixed(1)},${(height - 3 - ((v - min) / span) * (height - 6)).toFixed(1)}`)
-    .join(" ");
+  const pts = values.map(
+    (v, i) =>
+      `${(i * stepX).toFixed(1)},${(height - 3 - ((v - min) / span) * (height - 6)).toFixed(1)}`
+  );
+  const line = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p}`).join(" ");
+  const area = `${line} L${width.toFixed(1)},${height} L0,${height} Z`;
+  const last = values[values.length - 1];
+  const lastY = height - 3 - ((last - min) / span) * (height - 6);
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -78,13 +84,15 @@ export function Sparkline({
       aria-label={label}
       className="overflow-visible"
     >
-      <path d={d} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle
-        cx={width}
-        cy={height - 3 - ((values[values.length - 1] - min) / span) * (height - 6)}
-        r="2.5"
-        fill={stroke}
-      />
+      <defs>
+        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={stroke} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gid})`} />
+      <path d={line} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={width} cy={lastY} r="2.5" fill={stroke} />
     </svg>
   );
 }
