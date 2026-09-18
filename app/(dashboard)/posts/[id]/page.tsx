@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getPostDetail } from "@/lib/db/posts";
+import { PostActions } from "@/components/posts/post-actions";
 
 export default async function PostDetailPage({
   params,
@@ -20,6 +21,9 @@ export default async function PostDetailPage({
       <header>
         <h1 className="text-2xl font-semibold">{detail.title ?? "(tanpa judul)"}</h1>
         <p className="text-sm text-muted-foreground">Status: {detail.status}</p>
+        <div className="mt-3">
+          <PostActions postId={detail.id} status={detail.status} />
+        </div>
       </header>
       <section className="space-y-3">
         <h2 className="font-medium">Target platform</h2>

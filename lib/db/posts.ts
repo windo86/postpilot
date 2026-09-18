@@ -222,3 +222,47 @@ export async function listPosts(
   if (error) throw new Error(`Gagal memuat posts: ${error.message}`);
   return { data: (data ?? []) as PostDetail[] as unknown as { id: string; title: string | null; status: PostStatus; created_at: string }[], total: count ?? 0 };
 }
+
+/**
+ * Hitung ulang status parent dari semua target platform:
+ * published ← semua published; partial_failed ← campuran sukses+gagal;
+ * failed ← semua gagal; processing ← ada yang jalan; scheduled ← ada
+ * yang queued; cancelled ← semua cancelled; selain itu draft.
+ */
+export async function recomputePostStatus(
+  client: SupabaseClient,
+  postId: string,
+  userId: string
+): Promise<PostStatus> {
+  const { data, error } = await client
+    .from("post_platforms")
+    .select("status")
+    .eq("post_id", postId);
+  if (error) throw new Error(`Gagal hitung status: ${error.message}`);
+  const statuses = ((data ?? []) as { status: string }[]).map((r) => r.status);
+
+  let next: PostStatus = "draft";
+  if (statuses.length === 0) {
+    next = "draft";
+  } else if (statuses.every((s) => s === "published")) {
+    next = "published";
+  } else if (statuses.every((s) => s === "failed")) {
+    next = "failed";
+  } else if (statuses.every((s) => s === "cancelled")) {
+    next = "cancelled";
+  } else if (statuses.some((s) => s === "processing")) {
+    next = "processing";
+  } else if (statuses.some((s) => s === "published" || s === "failed")) {
+    next = "partial_failed";
+  } else if (statuses.some((s) => s === "queued")) {
+    next = "scheduled";
+  }
+
+  const { error: upError } = await client
+    .from("posts")
+    .update({ status: next, updated_at: new Date().toISOString() })
+    .eq("id", postId)
+    .eq("user_id", userId);
+  if (upError) throw new Error(`Gagal update status post: ${upError.message}`);
+  return next;
+}
