@@ -101,7 +101,7 @@ export function Sidebar({
       <aside
         className={cn(
           "glass-panel sticky top-0 hidden h-screen shrink-0 rounded-none border-y-0 border-l-0 transition-[width] duration-200 lg:block",
-          collapsed ? "w-[68px]" : "w-[232px]"
+          collapsed ? "w-[68px]" : "w-[208px]"
         )}
       >
         <SidebarBody collapsed={collapsed} />
