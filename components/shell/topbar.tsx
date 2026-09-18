@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, LogOut, Menu, Plus, Search } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { NotificationBell } from "@/components/notifications/bell";
 import { titleForPath } from "@/components/shell/nav";
@@ -64,13 +64,6 @@ export function Topbar({ email, onMenu }: { email: string; onMenu: () => void })
             <kbd className="rounded border border-border px-1.5 font-mono text-[11px]">⌘K</kbd>
           </button>
           <NotificationBell />
-          <Link
-            href="/posts/new"
-            className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-accent bg-gradient-to-b from-[rgb(255_255_255/0.14)] via-transparent to-transparent px-3 py-1.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.16)] hover:bg-[var(--accent-hover)] sm:flex"
-          >
-            <Plus size={15} />
-            New
-          </Link>
           <div ref={menuRef} className="relative">
             <button
               type="button"
