@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { TrendChart } from "@/components/analytics/trend-chart";
 
 interface Metrics {
   likes: number | null;
@@ -33,6 +34,7 @@ export function AnalyticsOverview() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [trendId, setTrendId] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
   const refreshList = useCallback(() => setReloadToken((t) => t + 1), []);
@@ -49,6 +51,7 @@ export function AnalyticsOverview() {
       }
       const j = await res.json();
       setRows(j.data ?? []);
+      setTrendId((prev) => prev ?? j.data?.[0]?.platformId ?? null);
     })().catch(() => {
       if (!cancelled) setError("Gagal memuat analytics.");
     });
@@ -104,6 +107,29 @@ export function AnalyticsOverview() {
         <p className="text-sm text-muted-foreground">
           Belum ada post published. Metrik muncul setelah worker publish.
         </p>
+      )}
+
+      {rows.length > 0 && (
+        <section className="rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-medium">Tren performa</h2>
+            <select
+              value={trendId ?? ""}
+              onChange={(e) => setTrendId(e.target.value || null)}
+              className="max-w-xs rounded-lg border border-input bg-background px-2 py-1.5 text-sm"
+              aria-label="Pilih post untuk grafik"
+            >
+              {rows.map((r) => (
+                <option key={r.platformId} value={r.platformId}>
+                  {(r.postTitle ?? "(tanpa judul)").slice(0, 40)} · {r.platform}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mt-3">
+            {trendId && <TrendChart platformId={trendId} />}
+          </div>
+        </section>
       )}
 
       {rows.map((r) => (

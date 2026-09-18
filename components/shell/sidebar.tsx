@@ -97,7 +97,7 @@ export function Sidebar({
       {/* Desktop */}
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 border-r border-sidebar-border bg-sidebar backdrop-blur-xl transition-[width] duration-200 lg:block",
+          "glass-panel sticky top-0 hidden h-screen shrink-0 rounded-none border-y-0 border-l-0 transition-[width] duration-200 lg:block",
           collapsed ? "w-[68px]" : "w-[232px]"
         )}
       >
@@ -117,7 +117,7 @@ export function Sidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCloseMobile} aria-hidden />
-          <aside className="absolute left-0 top-0 h-full w-[248px] border-r border-sidebar-border bg-sidebar">
+          <aside className="glass-panel absolute left-0 top-0 h-full w-[248px] rounded-none border-y-0 border-l-0">
             <button
               type="button"
               onClick={onCloseMobile}

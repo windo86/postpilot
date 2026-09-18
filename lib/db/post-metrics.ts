@@ -70,6 +70,22 @@ export interface PlatformWithMetrics {
   metrics: MetricSnapshot | null;
 }
 
+/** Riwayat snapshot terlama→terbaru untuk grafik tren. */
+export async function listHistory(
+  client: SupabaseClient,
+  platformId: string,
+  limit = 30
+): Promise<MetricSnapshot[]> {
+  const { data, error } = await client
+    .from("post_metrics")
+    .select("id,likes,comments,shares,saves,views,reach,impressions,fetched_at")
+    .eq("post_platform_id", platformId)
+    .order("fetched_at", { ascending: true })
+    .limit(Math.min(Math.max(limit, 1), 100));
+  if (error) throw new Error(`Gagal memuat riwayat: ${error.message}`);
+  return (data ?? []) as MetricSnapshot[];
+}
+
 /** Latest snapshot per published target milik user (filter platform opsional). */
 export async function listPlatformsWithMetrics(
   client: SupabaseClient,

@@ -92,7 +92,7 @@ export async function DashboardHome({
           </div>
           <Link
             href="/posts/new"
-            className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_24px_-8px_rgb(59_130_246/0.6)] hover:bg-[var(--accent-hover)]"
+            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-accent bg-gradient-to-b from-[rgb(255_255_255/0.14)] via-transparent to-transparent px-4 py-2.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.16),0_8px_24px_-8px_rgb(47_109_228/0.6)] hover:bg-[var(--accent-hover)]"
           >
             <Plus size={15} />
             Buat Postingan

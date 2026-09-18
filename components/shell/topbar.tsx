@@ -41,7 +41,7 @@ export function Topbar({ email, onMenu }: { email: string; onMenu: () => void })
   const initial = (email.trim()[0] ?? "?").toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-[rgb(10_14_20/0.78)] backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-[rgb(255_255_255/0.07)] bg-[rgb(10_14_20/0.72)] backdrop-blur-xl [box-shadow:inset_0_1px_0_rgb(255,255,255,0.05)]">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4 sm:px-6">
         <button
           type="button"
@@ -66,7 +66,7 @@ export function Topbar({ email, onMenu }: { email: string; onMenu: () => void })
           <NotificationBell />
           <Link
             href="/posts/new"
-            className="hidden items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--accent-hover)] sm:flex"
+            className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-accent bg-gradient-to-b from-[rgb(255_255_255/0.14)] via-transparent to-transparent px-3 py-1.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.16)] hover:bg-[var(--accent-hover)] sm:flex"
           >
             <Plus size={15} />
             New
@@ -85,7 +85,7 @@ export function Topbar({ email, onMenu }: { email: string; onMenu: () => void })
               <ChevronDown size={14} className="text-muted-foreground" />
             </button>
             {accountOpen && (
-              <div className="absolute right-0 top-11 w-56 overflow-hidden rounded-xl border border-border shadow-2xl" style={{ background: "var(--surface-elevated)" }}>
+              <div className="glass-panel absolute right-0 top-11 w-56 overflow-hidden rounded-xl">
                 <p className="truncate border-b border-border px-3 py-2.5 text-xs text-muted-foreground">{email}</p>
                 <Link
                   href="/settings"

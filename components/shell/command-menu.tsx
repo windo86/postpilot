@@ -102,8 +102,7 @@ export function CommandMenu() {
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Command menu">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
       <div
-        className="absolute left-1/2 top-[16vh] w-[min(560px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-xl border border-border shadow-2xl"
-        style={{ background: "var(--surface-elevated)" }}
+        className="glass-panel absolute left-1/2 top-[16vh] w-[min(560px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-xl"
       >
         <input
           ref={inputRef}
