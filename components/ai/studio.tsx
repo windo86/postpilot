@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface KeyMeta {
@@ -85,7 +86,7 @@ export function AIStudio() {
         </div>
         {keys.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Belum ada API key. <a href="/settings" className="underline">Tambah di Settings</a>.
+            Belum ada API key. <Link href="/settings" className="underline">Tambah di Settings</Link>.
           </p>
         ) : (
           <select
@@ -146,7 +147,7 @@ export function AIStudio() {
         )}
         {imageId && (
           <p className="text-sm text-muted-foreground">
-            Tersimpan di <a href="/media" className="underline">Media Library</a>.
+            Tersimpan di <Link href="/media" className="underline">Media Library</Link>.
           </p>
         )}
         {videoStatus && <p className="text-sm text-muted-foreground">{videoStatus}</p>}

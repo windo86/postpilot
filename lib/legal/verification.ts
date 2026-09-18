@@ -8,4 +8,6 @@ export const TIKTOK_VERIFICATION_FILES: Record<string, string> = {
     "tiktok-developers-site-verification=kxHeaY121HS9aXruJX0XOmYjxOlas6vj",
   "tiktokdu73k6ROyKjyX7gd4sqwjaadl0BSCzpQ.txt":
     "tiktok-developers-site-verification=du73k6ROyKjyX7gd4sqwjaadl0BSCzpQ",
+  "tiktokf58Os0cwB0zJx8nM96AMwzFJQQrMDSmr.txt":
+    "tiktok-developers-site-verification=f58Os0cwB0zJx8nM96AMwzFJQQrMDSmr",
 };

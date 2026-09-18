@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -208,7 +209,7 @@ export function Composer() {
           </div>
           {media.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Media kosong — upload baru atau tambah via <a href="/media" className="underline">Media Library</a>.
+              Media kosong — upload baru atau tambah via <Link href="/media" className="underline">Media Library</Link>.
             </p>
           )}
         </section>
@@ -217,7 +218,7 @@ export function Composer() {
           <h2 className="font-medium">2. Akun target</h2>
           {accounts.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Belum ada akun aktif. <a href="/accounts" className="underline">Connect dulu</a>.
+              Belum ada akun aktif. <Link href="/accounts" className="underline">Connect dulu</Link>.
             </p>
           )}
           {accounts.map((a) => (

@@ -15,6 +15,7 @@ export async function proxy(request: NextRequest) {
   const isPublic =
     PUBLIC_PATHS.includes(pathname) ||
     PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    (/^\/tiktok[^/]*\.txt$/.test(pathname)) || // file verifikasi root (TikTok)
     pathname.startsWith("/auth/");
 
   // Automation API bawa auth sendiri (API key) — lewatkan tanpa sesi.
