@@ -14,6 +14,9 @@ import { createServiceClient } from "@/lib/supabase/service-client";
 import { runWorkerIteration } from "@/lib/queue/processor";
 import { refreshDueTokens } from "@/lib/queue/token-refresh";
 import { refreshStaleAnalytics } from "@/lib/analytics/refresh";
+import { pollPendingVideoOperations } from "@/lib/ai/operations";
+import { createOpenAIProvider } from "@/lib/ai/openai";
+import { createGoogleProvider } from "@/lib/ai/google";
 
 /** Muat .env.local (Next.js melakukannya otomatis; Node biasa tidak). */
 function loadEnvFile(path = ".env.local"): void {
@@ -77,9 +80,16 @@ async function main(): Promise<void> {
         console.error(`[worker] analytics gagal: ${(e as Error).message}`);
         return 0;
       });
-      if (claimed > 0 || recovered > 0 || analytics > 0) {
+      const aiVideos = await pollPendingVideoOperations(client, [
+        createOpenAIProvider(),
+        createGoogleProvider(),
+      ]).catch((e) => {
+        console.error(`[worker] AI video gagal: ${(e as Error).message}`);
+        return 0;
+      });
+      if (claimed > 0 || recovered > 0 || analytics > 0 || aiVideos > 0) {
         console.log(
-          `[worker] iterasi: claimed=${claimed} recovered=${recovered} analytics=${analytics} (${Date.now() - started}ms)`
+          `[worker] iterasi: claimed=${claimed} recovered=${recovered} analytics=${analytics} aiVideos=${aiVideos} (${Date.now() - started}ms)`
         );
       }
     } catch (e) {
