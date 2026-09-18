@@ -25,7 +25,8 @@ export async function proxy(request: NextRequest) {
   if (!user) {
     // API: kembalikan 401 JSON (jangan redirect — client API butuh status mesin).
     // v1 memakai API key sendiri; /api/* lain dicek sesi di route masing-masing.
-    if (pathname.startsWith("/api/") && !isKeyAuthenticated) {
+    // Kecuali path API yang memang publik (mis. /api/health).
+    if (pathname.startsWith("/api/") && !isKeyAuthenticated && !isPublic) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (!isPublic && !isKeyAuthenticated) {
