@@ -7,6 +7,7 @@ import { Film, Image as ImageIcon, Smartphone, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlatformBadge } from "@/components/content/badges";
+import { InstagramPreview, TikTokPreview } from "@/components/posts/phone-preview";
 import { uploadFile } from "@/components/media/upload-file";
 
 interface MediaItem {
@@ -20,6 +21,7 @@ interface Account {
   platform: "instagram" | "tiktok";
   username: string | null;
   display_name: string | null;
+  avatar_url: string | null;
   platform_account_id: string;
   status: string;
 }
@@ -364,31 +366,51 @@ export function Composer() {
           const acc = accounts.find((a) => a.id === accId);
           const d = drafts[accId];
           if (!acc || !d) return null;
+          const firstId = selectedMedia[0];
+          const firstMeta = firstId ? media.find((m) => m.id === firstId) : undefined;
+          const previewMedia =
+            firstId && previews[firstId] && firstMeta
+              ? {
+                  url: previews[firstId],
+                  mediaType: firstMeta.media_type,
+                  alt: firstMeta.original_name ?? "Preview",
+                }
+              : null;
+          const name = acc.username ?? acc.display_name ?? acc.platform_account_id;
+          const tags = d.hashtags
+            .split(",")
+            .map((h) => h.trim().replace(/^#+/, ""))
+            .filter(Boolean)
+            .map((h) => `#${h}`)
+            .join(" ");
           return (
-            <article key={accId} className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
-              <PlatformBadge platform={acc.platform} />
-              <div className="mt-2 flex gap-2 overflow-x-auto">
-                {selectedMedia.map((mid) => (
-                  <div key={mid} className="h-24 w-24 shrink-0 rounded bg-muted">
-                    {previews[mid] &&
-                      (media.find((m) => m.id === mid)?.media_type === "video" ? (
-                        <video src={previews[mid]} className="h-full w-full rounded object-cover" preload="metadata" />
-                      ) : (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={previews[mid]} alt="" className="h-full w-full rounded object-cover" />
-                      ))}
-                  </div>
-                ))}
-                {selectedMedia.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Belum ada media.</p>
+            <div key={accId} className="space-y-2">
+              <p className="flex items-center gap-2">
+                <PlatformBadge platform={acc.platform} />
+                {acc.platform === "tiktok" && d.commercialDisclosure && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Tag size={12} /> Komersial · {d.privacyLevel}
+                  </span>
                 )}
-              </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm">{d.caption || "(tanpa caption)"}</p>
-              {d.hashtags && <p className="text-sm text-primary">{d.hashtags}</p>}
-              {acc.platform === "tiktok" && d.commercialDisclosure && (
-                <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Tag size={12} /> Konten komersial · {d.privacyLevel}</p>
+              </p>
+              {acc.platform === "instagram" ? (
+                <InstagramPreview
+                  media={previewMedia}
+                  username={name}
+                  avatarUrl={acc.avatar_url}
+                  caption={d.caption}
+                  hashtags={tags}
+                />
+              ) : (
+                <TikTokPreview
+                  media={previewMedia}
+                  username={name}
+                  avatarUrl={acc.avatar_url}
+                  caption={d.caption}
+                  hashtags={tags}
+                />
               )}
-            </article>
+            </div>
           );
         })}
       </div>
