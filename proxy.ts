@@ -14,10 +14,22 @@ export async function proxy(request: NextRequest) {
   const isPublic =
     PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/auth/");
 
-  if (!user && !isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+  // Automation API bawa auth sendiri (API key) — lewatkan tanpa sesi.
+  const isKeyAuthenticated =
+    pathname.startsWith("/api/v1/") || pathname.startsWith("/api/webhooks/");
+
+  if (!user) {
+    // API: kembalikan 401 JSON (jangan redirect — client API butuh status mesin).
+    // v1 memakai API key sendiri; /api/* lain dicek sesi di route masing-masing.
+    if (pathname.startsWith("/api/") && !isKeyAuthenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!isPublic && !isKeyAuthenticated) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
   }
 
   if (user && (pathname === "/login" || pathname === "/register")) {

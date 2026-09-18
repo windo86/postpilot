@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { validateInstagramPost } from "@/lib/validators/instagram";
+import { validateTikTokPost } from "@/lib/validators/tiktok";
+import type { MediaInfo } from "@/lib/validators/common";
 
 /**
  * Repository posts + post_platforms + post_media.
@@ -221,6 +224,53 @@ export async function listPosts(
     .range((p - 1) * pp, p * pp - 1);
   if (error) throw new Error(`Gagal memuat posts: ${error.message}`);
   return { data: (data ?? []) as PostDetail[] as unknown as { id: string; title: string | null; status: PostStatus; created_at: string }[], total: count ?? 0 };
+}
+
+/**
+ * Validasi platform-aware per target + buat post.
+ * Dipakai POST /api/posts (submit composer) dan POST /api/v1/posts (automation).
+ * Untuk TikTok, privacy dicek ulang worker dari creator_info terbaru (T-10).
+ */
+export async function createPostWithValidation(
+  client: SupabaseClient,
+  userId: string,
+  input: Omit<CreatePostInput, "userId">
+): Promise<{ postId: string; platformIds: string[] }> {
+  const { data: mediaRows, error } = await client
+    .from("media_assets")
+    .select("id,mime_type,file_size,width,height,duration_seconds")
+    .eq("user_id", userId)
+    .in("id", input.mediaIds);
+  if (error || (mediaRows ?? []).length !== input.mediaIds.length) {
+    throw new Error("Sebagian media tidak ditemukan");
+  }
+  const infos: MediaInfo[] = ((mediaRows ?? []) as {
+    mime_type: string; file_size: number; width: number | null; height: number | null; duration_seconds: number | null;
+  }[]).map((m) => ({
+    mimeType: m.mime_type,
+    sizeBytes: Number(m.file_size),
+    width: m.width,
+    height: m.height,
+    durationSeconds: m.duration_seconds,
+  }));
+
+  for (const t of input.targets) {
+    const result =
+      t.platform === "instagram"
+        ? validateInstagramPost({ media: infos, caption: t.caption, hashtags: t.hashtags })
+        : validateTikTokPost({
+            media: infos,
+            caption: t.caption,
+            hashtags: t.hashtags,
+            privacyLevel: t.privacyLevel,
+            creatorInfo: null,
+          });
+    if (!result.ok) {
+      throw new Error(`[${t.platform}] ${result.issues[0].message}`);
+    }
+  }
+
+  return createPost(client, { ...input, userId });
 }
 
 /**
