@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/logo";
 import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight, X } from "lucide-react";
 import { NAV_GROUPS, activeHrefForPath } from "@/components/shell/nav";
@@ -25,16 +25,13 @@ function SidebarBody({
         href="/"
         onClick={onNavigate}
         aria-label="PostPilot"
-        className="flex h-14 items-center justify-center border-b border-sidebar-border px-3"
+        className="flex h-16 items-center justify-center border-b border-sidebar-border px-3"
       >
-        <Image
-          src="/logo.png"
-          alt="PostPilot"
-          width={407}
-          height={145}
-          priority
-          className={collapsed ? "h-8 w-auto max-w-[56px] object-contain" : "h-11 w-auto max-w-[200px] object-contain"}
-        />
+        {collapsed ? (
+          <BrandLogo variant="square" className="h-8 max-w-[52px]" />
+        ) : (
+          <BrandLogo variant="horizontal" priority className="h-10 max-w-[180px]" />
+        )}
       </Link>
 
       <nav aria-label="Navigasi utama" className="flex-1 space-y-5 overflow-y-auto px-2.5 py-3">

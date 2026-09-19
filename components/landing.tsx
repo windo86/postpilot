@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Image as ImageIcon, PenLine, Sparkles } from "lucide-react";
+import { BrandLogo } from "@/components/brand/logo";
 
 const FEATURES = [
   { icon: PenLine, title: "Composer", desc: "Caption per platform, preview, dan validasi otomatis." },
@@ -13,7 +14,9 @@ export default function LandingPage() {
   return (
     <main className="mx-auto max-w-4xl space-y-10 p-6">
       <header className="flex items-center justify-between py-4">
-        <p className="text-lg font-semibold">PostPilot</p>
+        <p className="text-lg font-semibold" aria-label="PostPilot">
+          <BrandLogo variant="horizontal" className="h-8 max-w-[150px]" />
+        </p>
         <div className="flex gap-2">
           <Link href="/login" className="rounded-lg border border-input px-4 py-2 text-sm">
             Masuk

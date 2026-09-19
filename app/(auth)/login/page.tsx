@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { loginSchema } from "@/lib/auth/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BrandLogo } from "@/components/brand/logo";
 
 function LoginForm() {
   const router = useRouter();
@@ -55,7 +56,10 @@ function LoginForm() {
       onSubmit={onSubmit}
       className="w-full max-w-sm space-y-4 rounded-2xl border border-[rgb(255_255_255/0.07)] p-6"
     >
-        <h1 className="text-xl font-semibold">Masuk ke PostPilot</h1>
+        <div className="flex justify-center pb-1">
+          <BrandLogo variant="horizontal" className="h-11 max-w-[210px]" />
+        </div>
+        <h1 className="text-center text-xl font-semibold">Masuk ke PostPilot</h1>
         {error && (
           <p role="alert" className="text-sm text-destructive">
             {error}
