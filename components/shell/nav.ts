@@ -1,7 +1,6 @@
 import {
   BarChart3,
   CalendarDays,
-  FileText,
   Image,
   LayoutDashboard,
   Plus,
@@ -33,20 +32,19 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Content",
     entries: [
-      { href: "/posts", label: "Posts", icon: FileText },
+      { href: "/posts/new", label: "Posting Baru", icon: Plus },
       { href: "/media", label: "Media", icon: Image },
-      { href: "/posts/new", label: "Create", icon: Plus },
     ],
   },
   {
     title: "Planning",
-    entries: [{ href: "/schedule", label: "Calendar", icon: CalendarDays }],
+    entries: [{ href: "/schedule", label: "Kalender", icon: CalendarDays }],
   },
   {
     title: "Insights",
     entries: [
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
-      { href: "/trending", label: "Trending", icon: TrendingUp },
+      { href: "/trending", label: "Tren & Insight", icon: TrendingUp },
     ],
   },
   {
@@ -59,11 +57,11 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     title: "Accounts",
-    entries: [{ href: "/accounts", label: "Connected", icon: Users }],
+    entries: [{ href: "/accounts", label: "Akun Terhubung", icon: Users }],
   },
   {
-    title: "System",
-    entries: [{ href: "/settings", label: "Settings", icon: Settings }],
+    title: "Settings",
+    entries: [{ href: "/settings", label: "Pengaturan", icon: Settings }],
   },
 ];
 
@@ -84,6 +82,7 @@ export function activeHrefForPath(pathname: string): string | null {
 
 /** Judul konteks topbar dari path. */
 export function titleForPath(pathname: string): string {
+  if (pathname === "/posts" || pathname.startsWith("/posts/")) return "Posts";
   const active = activeHrefForPath(pathname);
   if (active) {
     for (const g of NAV_GROUPS) {
@@ -92,6 +91,5 @@ export function titleForPath(pathname: string): string {
     }
   }
   if (pathname.startsWith("/notifications")) return "Notifications";
-  if (pathname.startsWith("/posts/")) return "Post Detail";
   return "PostPilot";
 }
