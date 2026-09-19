@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlatformBadge, StatusBadge } from "@/components/content/badges";
 import {
@@ -46,6 +47,8 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
   const [drafts, setDrafts] = useState<DraftPost[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [draftWhen, setDraftWhen] = useState<Record<string, string>>({});
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [panelTime, setPanelTime] = useState<Record<string, string>>({});
   const [reloadToken, setReloadToken] = useState(0);
 
   const year = cursor.getFullYear();
@@ -224,12 +227,23 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
             const key = dayKeyInTz(noon, timezone);
             const dayItems = byDay.get(key) ?? [];
             const inMonth = day.getUTCMonth() === month;
+            const selected = selectedDay === key;
             return (
-              <div
+              <button
                 key={key + day.getTime()}
+                type="button"
+                onClick={() => setSelectedDay(selected ? null : key)}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => onDropDay(key, e)}
-                className={`min-h-20 rounded-xl p-1.5 transition-colors ${inMonth ? "hover:bg-[rgb(255_255_255/0.025)]" : "opacity-35"}`}
+                aria-pressed={selected}
+                aria-label={`Detail tanggal ${key}`}
+                className={`min-h-20 rounded-xl p-1.5 text-left transition-colors ${
+                  selected
+                    ? "ring-1 ring-accent/60 bg-[rgb(59_130_246/0.08)]"
+                    : inMonth
+                      ? "hover:bg-[rgb(255_255_255/0.025)]"
+                      : "opacity-35"
+                }`}
               >
                 <p className="text-xs text-muted-foreground">{day.getUTCDate()}</p>
                 {dayItems.map((it) => (
@@ -252,7 +266,7 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
                     {timeInTz(new Date(it.scheduledAt), timezone)} {it.postTitle ?? "(tanpa judul)"}
                   </div>
                 ))}
-              </div>
+              </button>
             );
           })}
         </div>
@@ -306,6 +320,20 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
         </div>
       )}
 
+      {selectedDay && (
+        <DayDetail
+          dayKey={selectedDay}
+          timezone={timezone}
+          items={byDay.get(selectedDay) ?? []}
+          drafts={drafts}
+          panelTime={panelTime}
+          onTimeChange={(id, v) => setPanelTime((s) => ({ ...s, [id]: v }))}
+          onReschedule={(postId, utc) => reschedulePost(postId, utc)}
+          onCancel={cancelPost}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
+
       <section className="space-y-2">
         <h2 className="text-sm font-medium text-muted-foreground">Draft (belum terjadwal)</h2>
         {drafts.length === 0 && (
@@ -330,5 +358,108 @@ export function ScheduleCalendar({ initialTimezone }: { initialTimezone: string 
         </p>
       </section>
     </div>
+  );
+}
+
+/** Panel detail hari: item terjadwal + jadwalkan draft pada tanggal ini. */
+function DayDetail({
+  dayKey,
+  timezone,
+  items,
+  drafts,
+  panelTime,
+  onTimeChange,
+  onReschedule,
+  onCancel,
+  onClose,
+}: {
+  dayKey: string;
+  timezone: string;
+  items: CalendarItem[];
+  drafts: DraftPost[];
+  panelTime: Record<string, string>;
+  onTimeChange: (draftId: string, time: string) => void;
+  onReschedule: (postId: string, utc: Date) => void;
+  onCancel: (postId: string) => void;
+  onClose: () => void;
+}) {
+  const label = new Date(`${dayKey}T12:00:00Z`).toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: timezone,
+  });
+  return (
+    <section aria-label={`Detail ${label}`} className="glass-panel space-y-3 rounded-2xl p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium">{label}</h2>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Tutup detail hari"
+          className="rounded-lg p-1.5 text-muted-foreground hover:bg-[rgb(255_255_255/0.06)] hover:text-foreground"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Tidak ada jadwal hari ini — seret post ke sini atau jadwalkan draft di bawah.
+        </p>
+      ) : (
+        <ul className="space-y-1">
+          {items.map((it) => (
+            <li
+              key={it.queueId}
+              className="flex flex-wrap items-center gap-2 rounded-xl px-2 py-2 hover:bg-[rgb(255_255_255/0.03)]"
+            >
+              <span className="tnum text-sm text-muted-foreground">
+                {timeInTz(new Date(it.scheduledAt), timezone)}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                {it.postTitle ?? "(tanpa judul)"}
+              </span>
+              <PlatformBadge platform={it.platform} />
+              <StatusBadge status={it.status} />
+              {it.status === "pending" && (
+                <Button variant="ghost" size="sm" onClick={() => onCancel(it.postId)}>
+                  Batal
+                </Button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {drafts.length > 0 && (
+        <div className="space-y-2 border-t border-[rgb(255_255_255/0.07)] pt-3">
+          <p className="text-xs text-muted-foreground">Jadwalkan draft pada tanggal ini:</p>
+          {drafts.map((d) => (
+            <div key={d.id} className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="min-w-0 flex-1 truncate font-medium">
+                {d.title ?? "(tanpa judul)"}
+              </span>
+              <input
+                type="time"
+                value={panelTime[d.id] ?? "09:00"}
+                onChange={(e) => onTimeChange(d.id, e.target.value)}
+                aria-label={`Jam untuk ${d.title ?? "draft"}`}
+                className="rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-2 py-1.5 text-xs"
+              />
+              <Button
+                size="sm"
+                onClick={() => {
+                  const t = panelTime[d.id] ?? "09:00";
+                  onReschedule(d.id, zonedWallToUtc(dayKey, t, timezone));
+                }}
+              >
+                Jadwalkan
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
