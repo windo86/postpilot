@@ -66,7 +66,12 @@ export function NotificationList() {
       {items.map((n) => (
         <article
           key={n.id}
-          className={`rounded-xl border p-4 ${n.read_at ? "border-border bg-card opacity-70" : "border-primary/40 bg-card"}`}
+          className={`rounded-2xl border px-4 py-3 ${
+            n.read_at
+              ? "border-[rgb(255_255_255/0.05)] opacity-60"
+              : "border-accent/30"
+          }`}
+          style={{ background: "var(--surface)" }}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>

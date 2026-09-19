@@ -96,7 +96,7 @@ export function TrendingManager() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
+      <div className="space-y-2 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4">
         <h2 className="font-medium">{editing ? "Edit topik" : "Tambah topik"}</h2>
         <Input
           placeholder="Keyword, mis. resep ayam geprek"
@@ -155,7 +155,7 @@ export function TrendingManager() {
         {topics.map((t) => (
           <li
             key={t.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-2 py-2.5 hover:bg-[rgb(255_255_255/0.03)]"
           >
             <div>
               <p className="font-medium">{t.keyword}</p>

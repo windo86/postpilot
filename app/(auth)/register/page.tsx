@@ -56,7 +56,7 @@ export default function RegisterPage() {
     <main className="flex min-h-screen items-center justify-center px-4">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-6"
+        className="w-full max-w-sm space-y-4 rounded-2xl border border-[rgb(255_255_255/0.07)] p-6"
       >
         <h1 className="text-xl font-semibold">Daftar PostPilot</h1>
         {error && (

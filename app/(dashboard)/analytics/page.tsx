@@ -1,15 +1,14 @@
 import { AnalyticsOverview } from "@/components/analytics/overview";
+import { PageHeader } from "@/components/content/primitives";
 
 export default function AnalyticsPage() {
   return (
-    <main className="mx-auto max-w-4xl space-y-6 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Analytics</h1>
-        <p className="text-sm text-muted-foreground">
-          Metrik per post, refresh maksimal 1 jam sekali (tombol Refresh memaksa).
-        </p>
-      </header>
+    <div className="mx-auto max-w-4xl space-y-5">
+      <PageHeader
+        title="Analytics"
+        description="Metrik per post, refresh maksimal 1 jam sekali."
+      />
       <AnalyticsOverview />
-    </main>
+    </div>
   );
 }

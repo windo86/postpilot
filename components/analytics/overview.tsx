@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TrendChart } from "@/components/analytics/trend-chart";
+import { PlatformBadge } from "@/components/content/badges";
 
 interface Metrics {
   likes: number | null;
@@ -79,11 +81,12 @@ export function AnalyticsOverview() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <select
           value={platform}
           onChange={(e) => setPlatform(e.target.value as "" | "instagram" | "tiktok")}
-          className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
+          aria-label="Filter platform"
+          className="rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-3 py-2 text-sm"
         >
           <option value="">Semua platform</option>
           <option value="instagram">Instagram</option>
@@ -91,9 +94,10 @@ export function AnalyticsOverview() {
         </select>
         <a
           href={platform ? `/api/analytics/export?platform=${platform}` : "/api/analytics/export"}
-          className="rounded-lg border border-input px-3 py-2 text-sm"
+          className="flex items-center gap-1.5 rounded-lg border border-[rgb(255_255_255/0.08)] px-3 py-2 text-sm text-muted-foreground hover:bg-[rgb(255_255_255/0.04)] hover:text-foreground"
         >
-          Export CSV
+          <Download size={14} />
+          CSV
         </a>
       </div>
 
@@ -110,13 +114,13 @@ export function AnalyticsOverview() {
       )}
 
       {rows.length > 0 && (
-        <section className="rounded-xl border border-border bg-card p-4">
+        <section className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-medium">Tren performa</h2>
+            <h2 className="text-sm font-medium">Tren performa</h2>
             <select
               value={trendId ?? ""}
               onChange={(e) => setTrendId(e.target.value || null)}
-              className="max-w-xs rounded-lg border border-input bg-background px-2 py-1.5 text-sm"
+              className="max-w-xs rounded-lg border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.03)] px-2 py-1.5 text-sm"
               aria-label="Pilih post untuk grafik"
             >
               {rows.map((r) => (
@@ -133,16 +137,18 @@ export function AnalyticsOverview() {
       )}
 
       {rows.map((r) => (
-        <article key={r.platformId} className="rounded-xl border border-border bg-card p-4">
+        <article key={r.platformId} className="rounded-2xl border border-[rgb(255_255_255/0.07)] p-4" style={{ background: "var(--surface)" }}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="font-medium">{r.postTitle ?? "(tanpa judul)"}</p>
-              <p className="text-sm text-muted-foreground">
-                {r.platform} · {r.username ?? "—"} ·{" "}
-                {r.publishedAt ? new Date(r.publishedAt).toLocaleString("id-ID") : "—"}
+            <div className="min-w-0">
+              <p className="truncate font-medium">{r.postTitle ?? "(tanpa judul)"}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <PlatformBadge platform={r.platform} />
+                {r.username ?? "—"} ·{" "}
+                {r.publishedAt ? new Date(r.publishedAt).toLocaleDateString("id-ID") : "—"}
               </p>
             </div>
-            <Button size="sm" variant="outline" disabled={busy === r.platformId} onClick={() => refresh(r.platformId)}>
+            <Button size="sm" variant="ghost" disabled={busy === r.platformId} onClick={() => refresh(r.platformId)}>
+              <RefreshCw size={13} className={busy === r.platformId ? "animate-spin" : ""} />
               {busy === r.platformId ? "Me-refresh..." : "Refresh"}
             </Button>
           </div>
@@ -160,13 +166,13 @@ export function AnalyticsOverview() {
                     ["Impressions", r.metrics.impressions],
                   ] as [string, number | null][]
                 ).map(([label, v]) => (
-                  <div key={label} className="rounded-lg bg-muted p-2">
-                    <dt className="text-xs text-muted-foreground">{label}</dt>
-                    <dd className="font-medium">{fmt(v)}</dd>
+                  <div key={label} className="rounded-xl bg-[rgb(255_255_255/0.03)] p-2.5">
+                    <dt className="text-[11px] text-muted-foreground">{label}</dt>
+                    <dd className="tnum font-medium">{fmt(v)}</dd>
                   </div>
                 ))}
               </dl>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="mt-2 text-xs text-muted-foreground tnum">
                 Diperbarui: {new Date(r.metrics.fetched_at).toLocaleString("id-ID")}
               </p>
             </>

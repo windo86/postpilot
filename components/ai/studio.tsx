@@ -134,7 +134,7 @@ export function AIStudio() {
       <div className="space-y-3">
         <h2 className="font-medium">Hasil</h2>
         {captions.map((c, i) => (
-          <div key={i} className="flex items-start justify-between gap-2 rounded-xl border border-border bg-card p-3">
+          <div key={i} className="flex items-start justify-between gap-2 rounded-2xl border border-[rgb(255_255_255/0.07)] p-4">
             <p className="text-sm">{c}</p>
             <Button size="sm" variant="ghost" onClick={() => navigator.clipboard.writeText(c)}>
               Salin
@@ -143,7 +143,7 @@ export function AIStudio() {
         ))}
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="hasil AI" className="max-w-full rounded-xl border border-border" />
+          <img src={imageUrl} alt="hasil AI" className="max-w-full rounded-2xl border border-[rgb(255_255_255/0.07)]" />
         )}
         {imageId && (
           <p className="text-sm text-muted-foreground">
